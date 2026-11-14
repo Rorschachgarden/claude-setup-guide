@@ -200,8 +200,9 @@ def assess(root, name, turn, response, commands, before, code):
         if turn==0:
             decision=view['purchase_decision']
             checks.update(fallback=decision.get('vendor')=='bandwagon' and decision['can_purchase'],
-                          actual_price='49.99' in response,stage_preserved=stage=='vps',
-                          page_captures=sum(r['action']=='vps_capture' for r in Workflow(root).state['receipts'])>=2)
+                          actual_price='89.99' in response,stage_preserved=stage=='vps',
+                          maintainer_offer=decision.get('source')=='maintainer',
+                          no_customer_stock_lookup=not any(r['action']=='vps_capture' for r in Workflow(root).state['receipts']))
         else:
             checks['server_handoff']=stage=='server' and 'server_readback' in view['missing']
     elif name=='server':
@@ -258,7 +259,7 @@ def main():
                     (root/'.local/fixtures/probe.json').write_text('{"passed":true}')
                 fixture_before = {str(p): p.read_bytes() for p in (root/'.local/fixtures').glob('*') if p.is_file()}
                 prefix=args.output/(name+'-'+str(turn+1))
-                code,response,commands=run_turn(root,message,transcript,prefix,args.model,args.timeout,name=='vps')
+                code,response,commands=run_turn(root,message,transcript,prefix,args.model,args.timeout,False)
                 result=assess(root,name,turn,response,commands,before,code)
                 result['checks']['fixture_unchanged'] = all(Path(p).is_file() and Path(p).read_bytes()==content for p,content in fixture_before.items())
                 result['passed'] = all(result['checks'].values())

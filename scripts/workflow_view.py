@@ -3,10 +3,11 @@ from copy import deepcopy
 
 
 def policy():
-    from vps_purchase import TARGETS, POLICY
+    from vps_purchase import TARGETS, POLICY, CURRENT_OFFER, CURRENT_INSTRUCTION
     from network_server import SERVER_OS, VERSION, XRAY_VERSION, DEFAULT_SNI, MIN_CLIENT_VERSION
     from download_karing import VERSION as KARING_VERSION
-    return {'server_system': SERVER_OS, 'vps_targets': TARGETS, 'purchase_instruction': POLICY,
+    return {'server_system': SERVER_OS, 'vps_targets': TARGETS, 'purchase_instruction': CURRENT_INSTRUCTION if CURRENT_OFFER else POLICY,
+            'current_recommendation': CURRENT_OFFER,
             'software': {'panel': VERSION, 'xray': XRAY_VERSION, 'karing': KARING_VERSION,
                          'sni': DEFAULT_SNI, 'min_client_version': MIN_CLIENT_VERSION}}
 

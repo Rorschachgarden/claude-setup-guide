@@ -16,6 +16,8 @@
 
 每次进入新阶段，先把控制层 `customer_message` 中的用途说明直接展示给客户，再执行操作；按 `display_instruction` 复用已讲过的内容。VPS、账号、浏览器、手机、网络检测和付款分别在对应步骤解释，具体时机见 references/17-workflow-controller.md。日常使用目标是电脑的 Claude 桌面端或 CLI，AdsPower 用于网页登录、相关邮件链接和授权。
 
+**当前临时推荐优先按 `workflow.py policy` 的 `current_recommendation` 执行：直接提供搬瓦工 USCA_9、2 GB、89.99 美元季付及原购买图解。库存由维护者统一检查，客户带做阶段直接继续注册、购买与开通。下述 DMIT 优先规则保留，当前推荐取消后恢复。**
+
 VPS 默认按 DMIT → 搬瓦工 → AKILE 逐家核对，目标套餐缺货再看下一家；默认付款周期分别为月付、季付、月付，下单前说明实际扣款总额和覆盖时长。年付或多年预付只在用户明确要求时比较。
 
 VPS 型号、系统与软件版本由 `python3 scripts/workflow.py policy` 返回，源头为现有脚本常量；库存采集、缺货分流及替代套餐说明统一见 references/18-vps-stock.md。进入 VPS 阶段按 purchase_decision 继续。

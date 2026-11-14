@@ -25,6 +25,8 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Mac Ka
 4. 恢复时运行 `workflow.py next`，复用统一状态；旧 `.local/progress.md` 仅作历史来源。更新后重读入口及当前操作涉及的小节。首页和带做总览在需要了解整体时查阅。
 5. 完成启动和资料读取后，运行 `python3 scripts/workflow.py init`，按返回的当前阶段继续。每次进入新阶段，先在客户对话展示 `customer_message` 的用途解释，再操作；同一阶段已讲过的内容按 `display_instruction` 复用。解释时机见 `references/17-workflow-controller.md`，日常使用目标是电脑桌面端或 CLI，AdsPower 负责网页登录与授权。首次带做先读 `references/13-reader-guide.md`；第一个实质问题由 `intake` 阶段给出：“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”已有答案直接复用。其后的设备说明、Google、VPS、浏览器、手机和订阅均由统一阶段定义推进。`devices` 阶段确认设备后，当场展示返回的 `customer_message`，展示完成再提交 `setup_explained=true`；接着介绍阅读版，继续账号准备。原教程保留具体操作和配图。
 
+**当前临时推荐优先按 `workflow.py policy` 的 `current_recommendation` 执行：直接提供搬瓦工 USCA_9、2 GB、89.99 美元季付及原购买图解。库存由维护者统一检查，客户带做阶段直接继续注册、购买与开通。下述 DMIT 优先规则保留，当前推荐取消后恢复。**
+
 VPS 默认按 DMIT → 搬瓦工 → AKILE 逐家核对，目标套餐缺货再看下一家；默认付款周期分别为月付、季付、月付，下单前说明实际扣款总额和覆盖时长。年付或多年预付只在用户明确要求时比较。
 
 VPS 型号、系统与软件版本由 `python3 scripts/workflow.py policy` 返回，源头为现有脚本常量；库存采集、缺货分流及替代套餐说明统一见 references/18-vps-stock.md。进入 VPS 阶段按 purchase_decision 继续。

@@ -27,6 +27,22 @@ POLICY = ('库存从实际订购目录和套餐配置页读取。DMIT 固定从 
           '没有客户选择就沿默认推荐继续；T1、Eyeball、其他世代和高价档不自动替代目标套餐。')
 
 
+# Temporary maintainer-selected offer; set to None to restore the DMIT-first route.
+CURRENT_OFFER = {
+    'vendor': 'bandwagon', 'plan': 'USCA_9-2GB', 'network': 'CN2 GIA',
+    'cycle': 'quarterly', 'amount': 89.99, 'renewal_amount': 89.99, 'currency': 'USD',
+    'url': 'https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9',
+    'reviewed_on': '2026-11-14',
+}
+CURRENT_GUIDANCE = ('当前推荐 **搬瓦工洛杉矶 USCA_9、2 GB、89.99 美元／三个月**。'
+    '[打开套餐页面](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)，选择 **2 GB → 3 Months**，系统选 **Debian 12**。'
+    '先按原图完成注册，再继续购买和开通；原图1 GB／49.99美元作为界面示例，当前按2 GB／89.99美元季付选择。')
+CURRENT_INSTRUCTION = ('维护者统一核查库存，当前直接向客户推荐 CURRENT_OFFER 指定的搬瓦工2 GB／89.99美元季付。'
+    '直接给套餐入口、选择路径和原注册购买图解，继续原注册、付款、开通流程；客户无需逐家查库存，Codex也不重复逐家查询。'
+    '付款时核对所选套餐与实际扣款金额；客户反馈缺货或页面金额变化时再核对当前购买页并反馈维护者。'
+    'DMIT优先的原规则保留，维护者调整当前推荐后再启用。已有VPS按原流程复用。')
+
+
 def default_offer(checks, errors):
     outcomes = []
     for vendor, target in TARGETS.items():
@@ -50,6 +66,10 @@ def default_offer(checks, errors):
 
 def evaluate(checks, now, *, alternatives=None, choice=None, captures=None):
     """Validate page observations once, then apply the agreed recommendation order."""
+    if CURRENT_OFFER and not checks and not alternatives and choice in (None, CURRENT_OFFER['plan']):
+        return {**CURRENT_OFFER, 'source': 'maintainer', 'status': 'available', 'can_purchase': True,
+                'checked': [], 'alternatives': [], 'recommended_plan': CURRENT_OFFER['plan'],
+                'order_url': CURRENT_OFFER['url']}
     checks = checks if isinstance(checks, dict) else {}
     errors = {vendor: (capture_error(vendor, checks[vendor], captures) or check_observation(vendor, checks[vendor], now)) for vendor in TARGETS if vendor in checks}
     result = default_offer(checks, errors)

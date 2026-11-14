@@ -126,11 +126,13 @@ def customer_output(result, state, now):
         messages.extend([GOOGLE_LOGIN_GUIDANCE, GOOGLE_VERIFICATION_GUIDANCE])
         result['verification_images'] = GOOGLE_VERIFICATION_IMAGES.copy()
     if key == 'vps':
-        from vps_purchase import POLICY, evaluate
+        from vps_purchase import POLICY, CURRENT_GUIDANCE, CURRENT_INSTRUCTION, evaluate
         purchase = result.get('purchase_decision') or evaluate(data.get('purchase_checks'), now, alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'), captures={})
         result['purchase_decision'] = purchase
-        result['purchase_instruction'] = POLICY
-        messages.extend([VPS_GUIDANCE, VPS_PURCHASE_GUIDANCE] if not data.get('vps_origin') else [VPS_PURCHASE_GUIDANCE])
+        maintained = purchase.get('source') == 'maintainer'
+        result['purchase_instruction'] = CURRENT_INSTRUCTION if maintained else POLICY
+        guidance = CURRENT_GUIDANCE if maintained else VPS_PURCHASE_GUIDANCE
+        messages.extend([VPS_GUIDANCE, guidance] if not data.get('vps_origin') else [guidance])
         result['next_action'] = ('VPS 选型直接按默认洛杉矶机房与目标套餐推进，不询问用户主要在哪个国家或地区使用、所在地、城市或运营商。'
                                  'node_timezone 从所选节点机房城市取得，已有 VPS 读取实际节点资料；用户主动提出特殊需求时按其需求调整。'
                                  '先核对已有 VPS 并复用；需要购买时按 DMIT → 搬瓦工 → AKILE 核对目标套餐，前一家缺货再看下一家。'
@@ -140,6 +142,8 @@ def customer_output(result, state, now):
         result['next_action'] += (' 先提交 vps_origin=existing 或 purchase；本次购买先按 purchase_instruction 核对并提交 purchase_checks，'
                                   '先 run --action vps_capture --input 页面输入.json 采集页面，观察填写 receipt_id 并逐字引用 evidence；'
                                   '可购买还需 billing_evidence 引用周期、本次金额和续费金额。用返回的 purchase_decision 决定查看哪家。can_purchase=true 才给付款指引。')
+        if maintained:
+            result['next_action'] = CURRENT_INSTRUCTION + ' 记录 vps_origin=existing 或 purchase；购买后确认服务器开通和SSH访问，再提交 access_ready=true。'
         if facts(state, 'vps').get('vps_origin') == 'purchase':
             for observation in purchase['checked']:
                 if observation['status'] == 'available':
@@ -147,7 +151,7 @@ def customer_output(result, state, now):
                 name = {'dmit': 'DMIT', 'bandwagon': '搬瓦工', 'akile': 'AKILE'}[observation['vendor']]
                 messages.append(name + {'sold_out': '目标套餐显示缺货。', 'not_listed': '当前完整目录没有列出目标套餐。', 'unknown': '库存尚未核实。', 'login_required': '订购页要求登录，库存尚未核实。'}[observation['status']])
             if purchase['can_purchase']:
-                messages.append('已核对目标套餐的实际配置页：' + purchase['plan'] + '，本次 ' + str(purchase['amount']) + ' ' + purchase['currency'] + '，付款周期 ' + {'monthly': '一个月', 'quarterly': '三个月'}[purchase['cycle']] + '，续费 ' + str(purchase['renewal_amount']) + ' ' + purchase['currency'] + '。付款前再核对同一套餐页面。')
+                messages.append(('维护者当前推荐：' if maintained else '已核对目标套餐的实际配置页：') + purchase['plan'] + '，本次 ' + str(purchase['amount']) + ' ' + purchase['currency'] + '，付款周期 ' + {'monthly': '一个月', 'quarterly': '三个月'}[purchase['cycle']] + '，续费 ' + str(purchase['renewal_amount']) + ' ' + purchase['currency'] + '。付款前再核对同一套餐页面。')
             else:
                 if purchase.get('vendor') and purchase['status'] != 'awaiting_choice':
                     messages.append('接下来核对 ' + purchase['plan'] + ' 的实际订购页面：[打开官方订购入口](' + purchase['url'] + ')。')

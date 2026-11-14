@@ -722,15 +722,12 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('远程服务器',message)
         self.assertIn('已买但没配置',message)
         self.assertNotIn('云端运行',message)
-        self.assertIn('DMIT → 搬瓦工 → AKILE', message)
-        self.assertIn('月付、季付、月付', message)
-        self.assertIn('实际付款总额', message)
+        self.assertIn('USCA_9', message)
+        self.assertIn('89.99 美元／三个月', message)
+        self.assertIn('2 GB', message)
         action = self.flow.next()['next_action']
-        self.assertIn('前一家缺货再看下一家', action)
-        self.assertIn('不询问用户主要在哪个国家或地区使用', action)
-        self.assertIn('node_timezone 从所选节点机房城市取得', action)
-        self.assertIn('年付或多年预付只在用户明确要求时比较', action)
-        self.assertIn('三家都缺货', action)
+        self.assertIn('维护者统一核查库存', action)
+        self.assertNotIn('vps_capture', action)
         self.assertNotIn('Hostinger', message + action)
 
 

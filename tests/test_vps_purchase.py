@@ -114,6 +114,11 @@ class PurchaseEvidenceTests(unittest.TestCase):
         self.assertEqual(r['plan'], 'LAX.AS3.Pro.TINY')
         self.assertEqual(r['alternatives'], [])
 
+    def test_disabling_temporary_offer_restores_dmit_first(self):
+        from unittest.mock import patch
+        with patch('vps_purchase.CURRENT_OFFER', None):
+            self.assertEqual(evaluate({}, NOW)['plan'], 'LAX.AS3.Pro.TINY')
+
 
 class PurchaseWorkflowTests(unittest.TestCase):
     setUp = fixtures.WorkflowTests.setUp
@@ -139,16 +144,19 @@ class PurchaseWorkflowTests(unittest.TestCase):
         x = observation(); x['checked_at'] = self.now.isoformat()
         return {'dmit': x}
 
-    def test_new_purchase_requires_order_observations_before_completion(self):
+    def test_current_offer_goes_directly_to_purchase_and_server(self):
         self.reach('vps')
         r = self.flow.submit(self.payload({'access_ready': False}))
         self.assertEqual(r['observed']['vps_origin'], 'purchase')
+        self.assertEqual(r['purchase_decision']['plan'], 'USCA_9-2GB')
+        self.assertEqual(r['purchase_decision']['amount'], 89.99)
+        self.assertEqual(r['purchase_decision']['cycle'], 'quarterly')
+        self.assertEqual(r['purchase_decision']['source'], 'maintainer')
+        self.assertEqual(r['purchase_decision']['checked'], [])
+        self.assertNotIn('vps_capture', r['next_action'])
+        self.assertIn('89.99', r['customer_message'])
+        self.assertNotIn('已核对目标套餐的实际配置页', r['customer_message'])
         d = self.data('vps'); d['vps_origin'] = 'purchase'
-        with self.assertRaises(WorkflowError): self.flow.submit(self.payload(d))
-        self.assertEqual(self.flow.next()['stage'], 'vps')
-        r = self.flow.submit(self.payload({'purchase_checks': self.checks()}))
-        self.assertTrue(r['purchase_decision']['can_purchase'])
-        self.assertEqual(r['stage'], 'vps')
         self.assertEqual(self.flow.submit(self.payload(d))['stage'], 'server')
         self.now += timedelta(days=2)
         self.assertEqual(self.flow.next()['stage'], 'server')
