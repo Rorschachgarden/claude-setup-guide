@@ -136,7 +136,7 @@ class TeachingTests(unittest.TestCase):
         self.assertIn('bandwagon-register-3.png',view['customer_message'])
         c.flow=Workflow(c.root,lambda:c.now)
         self.assertEqual(c.flow.next()['default_teaching']['step'],3)
-        view=c.flow.submit(c.payload({'teaching_topic':'vps_akile'}))
+        view=c.flow.submit(c.payload({'teaching_topic':'vps_dmit'}))
         self.assertNotIn('teaching_step',view['observed'])
         self.assertEqual(view['default_teaching']['step'],1)
 

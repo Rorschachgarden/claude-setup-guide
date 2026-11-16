@@ -275,7 +275,8 @@ def validation(stage, data, state, now):
         if not valid:
             issues.append(name)
     key = stage['id']
-    if key == 'vps' and data.get('vps_origin') == 'purchase':
+    # The purchase was checked when access_ready was accepted. Resume from that result.
+    if key == 'vps' and data.get('vps_origin') == 'purchase' and data.get('access_ready') is not True:
         from vps_purchase import evaluate
         if not evaluate(data.get('purchase_checks'), now,
                         alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'))['can_purchase']:

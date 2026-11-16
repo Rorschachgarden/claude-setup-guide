@@ -16,8 +16,7 @@ from workflow_guard import check
 
 ROOT = Path(__file__).resolve().parents[1]
 HOSTS = {'dmit': ('dmit.io', 'www.dmit.io'),
-         'bandwagon': ('bandwagonhost.com', 'www.bandwagonhost.com'),
-         'akile': ('akile.ai', 'www.akile.ai')}
+         'bandwagon': ('bandwagonhost.com', 'www.bandwagonhost.com')}
 
 
 class PageText(HTMLParser):

@@ -8,16 +8,14 @@ TARGETS = {
              'url': 'https://www.dmit.io/cart.php?region=los-angeles&network=premium&generation=as3'},
     'bandwagon': {'plan': 'USCA_9-1GB', 'network': 'CN2 GIA', 'cycle': 'quarterly',
                  'url': 'https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9'},
-    'akile': {'plan': 'LAXPremium-Mini', 'network': 'Premium', 'cycle': 'monthly',
-              'url': 'https://akile.ai/'},
 }
 DMIT_DESCRIPTION = '洛杉矶 Premium → AS3 → ' + TARGETS['dmit']['plan'] + '，参考价 10.90 美元/月'
-PURCHASE_GUIDANCE = ('需要购买时，默认按 **DMIT → 搬瓦工 → AKILE** 选：先从 [DMIT 实际订购目录](https://www.dmit.io/cart.php) 核对已成功交付的'
+PURCHASE_GUIDANCE = ('需要购买时，默认按 **DMIT → 搬瓦工** 选：先从 [DMIT 实际订购目录](https://www.dmit.io/cart.php) 核对已成功交付的'
     + DMIT_DESCRIPTION + '；缺货就核对并推荐有成熟适配经验的搬瓦工 ' + TARGETS['bandwagon']['plan'] +
-    '，搬瓦工也缺货再看 AKILE ' + TARGETS['akile']['plan'] + '。默认分别按月付、季付、月付准备；下单前列清实际付款总额、覆盖时长和续费金额。')
+    '。默认分别按月付、季付准备；下单前列清实际付款总额、覆盖时长和续费金额。')
 POLICY = ('库存从实际订购目录和套餐配置页读取。DMIT 固定从 https://www.dmit.io/cart.php 进入，'
           '默认已交付套餐为 ' + DMIT_DESCRIPTION + '。价格页的 Order Now、搜索摘要及旧图只作说明。'
-          '缺货、完整目录中目标未列出分别记录 sold_out、not_listed，继续搬瓦工 ' + TARGETS['bandwagon']['plan'] + '，再到 AKILE ' + TARGETS['akile']['plan'] + '。'
+          '缺货、完整目录中目标未列出分别记录 sold_out、not_listed，继续搬瓦工 ' + TARGETS['bandwagon']['plan'] + '。'
           'Cloudflare 验证、403、超时记 unknown；页面明确要求账户登录才记 login_required。优先复用客户已登录浏览器，'
           '仍无法读取就取得当前目标套餐区域的截图；查不到库存时继续核对下一家，并清楚说明前一家尚未核实。'
           '仅实际进入同一目标套餐配置页且取得计费周期、总额和续费金额，才可输出可购买。'
@@ -132,7 +130,7 @@ def capture_error(vendor, item, captures):
         cycles = {'monthly': ('monthly', '月付', '每月', '/month'), 'quarterly': ('quarterly', '季付', '三个月', '3 months')}
         if not any(x in billing.lower() for x in cycles.get(item.get('cycle'), ())):
             return 'billing_cycle_not_in_page'
-        currencies = {'USD': ('usd', 'us$', '$'), 'CNY': ('cny', 'rmb', '¥', '￥', '元')}
+        currencies = {'USD': ('usd', 'us$', '$')}
         if not any(x in billing.lower() for x in currencies.get(item.get('currency'), ())):
             return 'billing_currency_not_in_page'
     return None
@@ -146,8 +144,7 @@ def check_observation(vendor, item, now, *, target=None):
         return 'target_mismatch'
     try:
         u = urlsplit(item.get('url', ''))
-        host = {'dmit': ('dmit.io', 'www.dmit.io'), 'bandwagon': ('bandwagonhost.com', 'www.bandwagonhost.com'),
-                'akile': ('akile.ai', 'www.akile.ai')}[vendor]
+        host = {'dmit': ('dmit.io', 'www.dmit.io'), 'bandwagon': ('bandwagonhost.com', 'www.bandwagonhost.com')}[vendor]
         if u.scheme != 'https' or u.hostname not in host or u.username or u.password:
             return 'official_order_url_required'
         if vendor == 'dmit' and u.path != '/cart.php':
@@ -191,6 +188,6 @@ def check_observation(vendor, item, now, *, target=None):
         value = item.get(key)
         if type(value) not in (int, float) or not 0 < value < 100000:
             return 'payment_total_required'
-    if item.get('currency') != ('CNY' if vendor == 'akile' else 'USD'):
+    if item.get('currency') != 'USD':
         return 'currency_mismatch'
     return None

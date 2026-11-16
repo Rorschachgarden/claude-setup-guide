@@ -34,7 +34,7 @@ DEFAULT_SNI = "www.cloudflare.com"
 MIN_CLIENT_VERSION = "1.0.0"
 SERVER_OS = {"id": "debian", "version_id": "12", "name": "Debian 12"}
 SERVER_OS_INSTRUCTION = (
-    '新购 VPS 默认选择 ' + SERVER_OS['name'] + '，DMIT、搬瓦工和 AKILE 使用同一系统规则。'
+    '新购 VPS 默认选择 ' + SERVER_OS['name'] + '，DMIT 和搬瓦工使用同一系统规则。'
     '选系统时核对当前选中项；商家没有提供该系统时，先说明实际选项并与客户确认处理方式。'
     '首次脚本部署从服务器 /etc/os-release 读取实际系统，符合规则后继续。'
     '系统不同先处理差异；已有正常节点继续核对复用，重装需客户明确确认。')

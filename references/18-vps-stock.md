@@ -4,11 +4,10 @@
 
 ## 固定入口与推荐顺序
 
-系统选择统一沿用 [网络教程「选系统」](01-network.md#二选系统) 的 Debian 12 规则，三家商家一致；付款前核对所选系统，首次脚本部署读取实际系统验证。
+系统选择统一沿用 [网络教程「选系统」](01-network.md#二选系统) 的 Debian 12 规则，两家商家一致；付款前核对所选系统，首次脚本部署读取实际系统验证。
 
 1. 打开 [DMIT 实际订购目录](https://www.dmit.io/cart.php)，选 **Los Angeles → Premium → AS3 → LAX.AS3.Pro.TINY**。这是已成功交付的默认套餐，参考价 **10.90 美元/月**；本次金额读取实际页面。可直接打开 [已选分类](https://www.dmit.io/cart.php?region=los-angeles&network=premium&generation=as3)，打开后回读所选分类和完整型号。
 2. 默认套餐缺货就查看 [搬瓦工 USCA_9、1 GB、季付](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)，这是有成熟适配经验的第二顺位，有货就首推搬瓦工。
-3. 搬瓦工目标套餐也缺货，再看 [AKILE](https://akile.ai/) 的 LAX Premium → LAXPremium-Mini，默认月付。
 
 原教程的 AN5、9.99 美元截图保留作界面操作示例；当前默认套餐按本章。原图、系统选择、SSH 和后续部署教学继续使用，图中价格与库存不覆盖当前查验。
 
@@ -39,7 +38,7 @@
 
 在 `vps` 阶段先提交 `vps_origin=existing`（已有 VPS）或 `purchase`（本次购买）。客户说没有 VPS、提交 `access_ready=false` 时程序按本次购买处理。已有和旧版已完成服务器复用。
 
-本次购买通过常规 `workflow.py submit --input ...` 提交 `purchase_checks`，键依次为 `dmit`、`bandwagon`、`akile`。每项取本次采集回执中的实际页面观察，并增加 `receipt_id`：
+本次购买通过常规 `workflow.py submit --input ...` 提交 `purchase_checks`，键依次为 `dmit`、`bandwagon`。每项取本次采集回执中的实际页面观察，并增加 `receipt_id`：
 
 ```json
 {
@@ -55,14 +54,14 @@
 ```
 
 - `page`：`catalog`、`configuration`、`challenge`、`error`、`login`。
-- `status`：`sold_out`、`not_listed`、`available`、`unknown`、`login_required`。`not_listed` 需 `catalog_complete=true`；`available` 需 `page=configuration`，并提供 `cycle`（`monthly`／`quarterly`）、正数 `amount`、正数 `renewal_amount`、`currency`（DMIT／搬瓦工 USD，AKILE CNY）。
-- `evidence` 摘录当前目标套餐区域和配置页可见结果，包含完整套餐身份；搬瓦工的规范标识为 `USCA_9-1GB`（对应页面 USCA_9 与 1 GB），AKILE 为 `LAXPremium-Mini`。只记录产品信息，不记录账号、Cookie、令牌或付款资料。若页面跳转，`url` 使用跳转后的实际 URL；不能把价格页内容改标为购物车证据。
+- `status`：`sold_out`、`not_listed`、`available`、`unknown`、`login_required`。`not_listed` 需 `catalog_complete=true`；`available` 需 `page=configuration`，并提供 `cycle`（`monthly`／`quarterly`）、正数 `amount`、正数 `renewal_amount`、`currency`（USD）。
+- `evidence` 摘录当前目标套餐区域和配置页可见结果，包含完整套餐身份；搬瓦工的规范标识为 `USCA_9-1GB`（对应页面 USCA_9 与 1 GB）。只记录产品信息，不记录账号、Cookie、令牌或付款资料。若页面跳转，`url` 使用跳转后的实际 URL；不能把价格页内容改标为购物车证据。
 - 每次提交 `purchase_checks` 为完整检查映射，保留本轮仍有效的前序检查；商品身份、URL、缺货标签、周期和时间由 `scripts/vps_purchase.py` 核对。观察必须关联本次采集回执；程序核对 URL、采集时间、页面类型、原文引用以及费用引用。纯文字推测不产生可购买结果。
 - `purchase_decision` 返回下一家、检查原因、默认推荐和可购买状态。只有 `can_purchase=true` 才继续当前选定套餐的付款指引；随后确认 VPS 开通及 SSH 访问再提交 `access_ready=true`。
 - 其他 DMIT 套餐放入 `dmit_alternatives` 列表，字段同上，状态必须为 `available`。程序独立校验实际配置页、完整型号、线路、月付费用与观察时间；仅通过核对的套餐出现在选项中。
 - 默认 DMIT 缺货且存在已验证的其他 DMIT 选项时，程序保留搬瓦工优先级并等待选择。客户回复以后，以 `source.kind=user`、`source.reference` 记录原话，提交 `purchase_choice` 为完整套餐标识（例如推荐的 `USCA_9-1GB`，或已验证的 DMIT 其他型号）。程序不接受工具替客户选择；刷新页面后沿用客户选定型号，所选套餐缺货则重新选择，费用变化先说明当前金额。
 
-三家均未取得可购买结果时，分别报告缺货与未核实的实际情况，再确认等待或其他已核实选项。完成购买后的库存变化不会把已交付的服务器退回购买阶段。
+两家均未取得可购买结果时，分别报告缺货与未核实的实际情况，再确认等待或其他已核实选项。完成购买后的库存变化不会把已交付的服务器退回购买阶段。
 
 
 ## 页面采集与引用

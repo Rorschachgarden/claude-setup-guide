@@ -1,11 +1,11 @@
 {
-  "revision": "2026-10-27",
+  "revision": "2026-11-15",
   "files": [
     {
       "file": "01-纯净魔法从零部署.pdf",
       "pages": 24,
-      "sha256": "d83b617fc13bfc3a0e17f9cef1c5a7848ab4eeca8cb58cd5cf0b30a9c1e19176",
-      "revised_at": "2026-10-23"
+      "sha256": "af4018072d31d44471762de1c8d1d3fc509fccdf5ff86aec0eea759118404eae",
+      "revised_at": "2026-11-15"
     },
     {
       "file": "02-指纹浏览器与 iPhone 网络配置.pdf",
@@ -45,9 +45,9 @@
     },
     {
       "file": "08-VPS 注册与购买图解.pdf",
-      "pages": 8,
-      "sha256": "a8506a2f0da5973ba3b6d655f09816884a4dbfeb639dfa3b023eae7433edffd5",
-      "revised_at": "2026-10-18"
+      "pages": 7,
+      "sha256": "34684f6c69890c883931ecb0f66803198a05373c070701e6fbd9f95057069b29",
+      "revised_at": "2026-11-15"
     },
     {
       "file": "09-搬瓦工注册中文图解_原始配图版.pdf",
@@ -57,9 +57,9 @@
     },
     {
       "file": "10-VPS购买推荐官网图解_原始配图版.pdf",
-      "pages": 2,
-      "sha256": "861b3dc6ac1d87c13338269b631627d47b0b7a9a4a4399278eb6de33a97243f6",
-      "revised_at": "2026-10-18"
+      "pages": 1,
+      "sha256": "1fa243d14ae1da595dfce80200baa82ef0984aadb3a38a402c8df1518209dd2a",
+      "revised_at": "2026-11-15"
     }
   ]
 }

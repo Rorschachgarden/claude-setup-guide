@@ -81,7 +81,7 @@ def customer_output(result, state, now):
         from network_server import SERVER_OS, SERVER_OS_INSTRUCTION
         result['server_system'] = SERVER_OS.copy()
         result['server_system_instruction'] = SERVER_OS_INSTRUCTION
-        messages.append('服务器系统默认选择 **' + SERVER_OS['name'] + '**，DMIT、搬瓦工和 AKILE 都按这一项选择。首次部署前我会读取服务器实际系统核对；已有正常节点继续复用。')
+        messages.append('服务器系统默认选择 **' + SERVER_OS['name'] + '**，DMIT 和搬瓦工都按这一项选择。首次部署前我会读取服务器实际系统核对；已有正常节点继续复用。')
     if key == 'intake':
         result['customer_message'] = '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？'
     if key == 'cleanup':
@@ -135,9 +135,9 @@ def customer_output(result, state, now):
         messages.extend([VPS_GUIDANCE, guidance] if not data.get('vps_origin') else [guidance])
         result['next_action'] = ('VPS 选型直接按默认洛杉矶机房与目标套餐推进，不询问用户主要在哪个国家或地区使用、所在地、城市或运营商。'
                                  'node_timezone 从所选节点机房城市取得，已有 VPS 读取实际节点资料；用户主动提出特殊需求时按其需求调整。'
-                                 '先核对已有 VPS 并复用；需要购买时按 DMIT → 搬瓦工 → AKILE 核对目标套餐，前一家缺货再看下一家。'
-                                 '默认付款周期为 DMIT 月付、搬瓦工季付、AKILE 月付，按当前结账页说明实际扣款总额、覆盖时长和续费金额；'
-                                 '年付或多年预付只在用户明确要求时比较。三家都缺货则确认等待或在这三家内比较其他同线路套餐。'
+                                 '先核对已有 VPS 并复用；需要购买时按 DMIT → 搬瓦工的顺序核对目标套餐，前一家缺货再看下一家。'
+                                 '默认付款周期为 DMIT 月付、搬瓦工季付，按当前结账页说明实际扣款总额、覆盖时长和续费金额；'
+                                 '年付或多年预付只在用户明确要求时比较。两家都缺货则确认等待或在这两家内比较其他同线路套餐。'
                                  '已有客户选择按其要求继续；准备好 VPS 与 SSH 访问后提交本阶段观察。')
         result['next_action'] += (' 先提交 vps_origin=existing 或 purchase；本次购买先按 purchase_instruction 核对并提交 purchase_checks，'
                                   '先 run --action vps_capture --input 页面输入.json 采集页面，观察填写 receipt_id 并逐字引用 evidence；'
@@ -148,7 +148,7 @@ def customer_output(result, state, now):
             for observation in purchase['checked']:
                 if observation['status'] == 'available':
                     continue
-                name = {'dmit': 'DMIT', 'bandwagon': '搬瓦工', 'akile': 'AKILE'}[observation['vendor']]
+                name = {'dmit': 'DMIT', 'bandwagon': '搬瓦工'}[observation['vendor']]
                 messages.append(name + {'sold_out': '目标套餐显示缺货。', 'not_listed': '当前完整目录没有列出目标套餐。', 'unknown': '库存尚未核实。', 'login_required': '订购页要求登录，库存尚未核实。'}[observation['status']])
             if purchase['can_purchase']:
                 messages.append(('维护者当前推荐：' if maintained else '已核对目标套餐的实际配置页：') + purchase['plan'] + '，本次 ' + str(purchase['amount']) + ' ' + purchase['currency'] + '，付款周期 ' + {'monthly': '一个月', 'quarterly': '三个月'}[purchase['cycle']] + '，续费 ' + str(purchase['renewal_amount']) + ' ' + purchase['currency'] + '。付款前再核对同一套餐页面。')
@@ -156,7 +156,7 @@ def customer_output(result, state, now):
                 if purchase.get('vendor') and purchase['status'] != 'awaiting_choice':
                     messages.append('接下来核对 ' + purchase['plan'] + ' 的实际订购页面：[打开官方订购入口](' + purchase['url'] + ')。')
                 elif not purchase.get('vendor'):
-                    messages.append('三家目标套餐目前都没有取得可购买结果，接下来按您的选择等待补货或比较同线路的其他套餐。')
+                    messages.append('两家目标套餐目前都没有取得可购买结果，接下来按您的选择等待补货或比较同线路的其他套餐。')
             if purchase['alternatives']:
                 messages.append('另外查到以下 DMIT 套餐的实际配置页可以购买，但这些套餐目前没有交付实践；搬瓦工已有成熟适配经验，我们仍优先推荐搬瓦工。')
                 for offer in purchase['alternatives']:

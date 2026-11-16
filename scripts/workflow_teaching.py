@@ -45,7 +45,6 @@ CARDS = {
                      '按当前小步骤选图：套餐、系统、订单、结算、服务器资料；原图 AN5 与 9.99 美元作界面示例，当前默认已交付套餐为 ' + DMIT_DESCRIPTION + '。库存从 cart.php 读取，按 references/18-vps-stock.md 核对及选择后再给付款指引。' + SERVER_OS_INSTRUCTION),
     'vps_bandwagon': card('搬瓦工注册与购买', 'vps', '09-vps-purchase.md', pics('vps-purchase', 'bandwagon-register-1.png', 'bandwagon-register-2.png', 'bandwagon-register-3.png', 'bandwagon-register-4.png', 'bandwagon-plan.png'),
                          '按客户当前注册或选套餐页面选择对应的一张图，已有账号直接进入选套餐步骤。'),
-    'vps_akile': card('AKILE 套餐选择', 'vps', '09-vps-purchase.md', pics('vps-purchase', 'akile-plan.png'), '当前是套餐选购图，注册字段按实际页面逐项说明。'),
     'server_panel': card('服务端面板和节点参数', 'server', '01-network.md', pics('images/network', '10.jpg', '11.jpg', '12.jpg', '13.jpg'),
                         '按面板、创建节点及参数页选图；由 Codex 使用部署工具时说明当前结果，需要客户手动操作再按图带做。'),
     'node_export': card('找到节点导出入口', 'server phone_proxy', '01-network.md', pics('images/network', '14.jpg'),

@@ -13,7 +13,7 @@ def observation(vendor='dmit', status='available'):
     t = TARGETS[vendor]
     return {**t, 'status': status, 'page': 'configuration', 'checked_at': NOW.isoformat(),
             'evidence': t['plan'] + (' Out of Stock' if status == 'sold_out' else ' configuration Monthly'),
-            'amount': 10.90, 'currency': 'CNY' if vendor == 'akile' else 'USD', 'renewal_amount': 10.90}
+            'amount': 10.90, 'currency': 'USD', 'renewal_amount': 10.90}
 
 
 def alternative():
@@ -43,13 +43,14 @@ class PurchaseEvidenceTests(unittest.TestCase):
         x = observation(); x['page'] = 'catalog'
         self.assertFalse(evaluate({'dmit': x}, NOW)['can_purchase'])
 
-    def test_sold_out_goes_to_bandwagon_and_then_akile(self):
+    def test_sold_out_goes_to_bandwagon_then_reports_no_offer(self):
         checks = {'dmit': observation(status='sold_out')}
         self.assertEqual(evaluate(checks, NOW)['vendor'], 'bandwagon')
         checks['bandwagon'] = observation('bandwagon', 'sold_out')
-        self.assertEqual(evaluate(checks, NOW)['vendor'], 'akile')
-        checks['akile'] = observation('akile', 'sold_out')
-        self.assertEqual(evaluate(checks, NOW)['status'], 'no_verified_offer')
+        checks['akile'] = {'status': 'available'}  # A saved check from the previous release.
+        result = evaluate(checks, NOW)
+        self.assertEqual(result['status'], 'no_verified_offer')
+        self.assertEqual([item['vendor'] for item in result['checked']], ['dmit', 'bandwagon'])
 
     def test_absent_target_requires_complete_catalog(self):
         x = observation(); x.update(status='not_listed', page='catalog', evidence='Full AN5 Premium list: MINI, MICRO, MEDIUM, LARGE, GIANT')
@@ -181,6 +182,13 @@ class PurchaseWorkflowTests(unittest.TestCase):
     def test_existing_and_legacy_completed_vps_are_reused(self):
         self.reach('vps'); self.advance()
         self.flow.state['records']['vps']['data'].pop('vps_origin')
+        self.assertEqual(self.flow.next()['stage'], 'server')
+
+    def test_completed_old_purchase_resumes_after_vendor_removal(self):
+        self.reach('server')
+        self.flow.state['records']['vps']['data'].update(
+            vps_origin='purchase', purchase_checks={'akile': {'status': 'available'}},
+        )
         self.assertEqual(self.flow.next()['stage'], 'server')
 
     def test_missing_origin_cannot_bypass_by_submitting_access_ready(self):

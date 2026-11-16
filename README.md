@@ -30,13 +30,13 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 
 初次开始，Codex 的第一个问题是“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”有的话，先按设备提供旧登录残留检查：电脑按系统使用内置的 [Mac 端清理 Skill](references/15-mac-cleanup.md) 或 [Windows 端清理 Skill](references/16-windows-cleanup.md)，iPhone 建议删除并重新下载官方 Claude App。处理或安排好适用事项后，确认电脑和手机类型、当场说明设备搭配并介绍阅读版；准备好 Google 账号后，再解释 VPS 是什么、问您有没有自建节点；没买、买了未配置、已经搭好，分别从对应步骤开始。普通梯子订阅不等于自建 VPS，已有服务器不用重复买。
 
-项目内附[客户阅读版 PDF](assets/reading/README.md)，共 10 份、79 页，整套最近更新于 2026-10-27；第 07 篇新增出海91注册与选购图示，第 02、04 篇同步手机必经流程与清理后衔接说明。这些 PDF 已经随程序／流程一起下载到项目的 `assets/reading/` 文件夹。Codex 会先明确告诉您 GitHub 项目本身已经下载好，再简短介绍 PDF 的用途和使用方法：遇到问题先问 Codex；问题还没解决或解释不明白时，可以让 Codex 找出对应 PDF、章节、页码和图示，您自己对照着看，仍不懂的内容可以截图继续问。我们建议您保存一份阅读版到方便打开的位置。讲清楚这些之后，Codex 才会询问是否需要把 PDF 单独保存到“下载”等文件夹；项目内已有文件，会直接复制一份给您，无需重新下载程序。暂时不保存也照常带做。
+项目内附[客户阅读版 PDF](assets/reading/README.md)，共 10 份、77 页，最近更新于 2026-11-15。这些 PDF 已经随程序／流程一起下载到项目的 `assets/reading/` 文件夹。Codex 会先明确告诉您 GitHub 项目本身已经下载好，再简短介绍 PDF 的用途和使用方法：遇到问题先问 Codex；问题还没解决或解释不明白时，可以让 Codex 找出对应 PDF、章节、页码和图示，您自己对照着看，仍不懂的内容可以截图继续问。我们建议您保存一份阅读版到方便打开的位置。讲清楚这些之后，Codex 才会询问是否需要把 PDF 单独保存到“下载”等文件夹；项目内已有文件，会直接复制一份给您，无需重新下载程序。暂时不保存也照常带做。
 
 阅读版以 Mac／iPhone 图解为主，Windows 和 Android 仍按各自专章带做。PDF 随完整项目提供；另存到本地的副本不会自动改变。项目更新带来新版 PDF 时，Codex 会提醒已保存阅读版的客户另存新版，保留旧副本与笔记。
 
 本仓库已公开。任何人都可以直接查看、下载和检查更新，不需要申请访问权限，也不需要登录 GitHub。你可以把仓库链接交给能读取 GitHub 的 AI，让它先完成最新版下载与校验，再从 SKILL.md 开始。链接交付时暂时无法联网就先解决连接，不自动改用旧副本。
 
-购买 VPS 时，AI 会按所选商家主动展示[搬瓦工注册与 AKILE 选购图解](references/09-vps-purchase.md)。也可直接保存[搬瓦工注册 PDF](assets/vps-purchase/bandwagon-registration.pdf) 和 [VPS 选购 PDF](assets/vps-purchase/vps-purchase-guide.pdf)。
+购买 VPS 时，AI 会按所选商家主动展示[搬瓦工注册与选购图解](references/09-vps-purchase.md)。也可直接保存[搬瓦工注册 PDF](assets/vps-purchase/bandwagon-registration.pdf) 和 [VPS 选购 PDF](assets/vps-purchase/vps-purchase-guide.pdf)。
 
 Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；Android 用户可按[官网 Google Pay 基础指引](references/11-android-web-pay.md)继续，付款前先了解案例较少及作者反馈的封号后无法退款风险；支付选项以实际页面为准。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
 

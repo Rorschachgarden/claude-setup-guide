@@ -26,7 +26,7 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 | 进入阶段 | 当场解释 |
 | --- | --- |
 | google | 先问有没有能正常登录 Claude、未被 Claude 封禁的 Google 账号；没有时同时展示出海91与 GmailBuy 的链接及选购差别，推荐美区 Google 老号。记住选择；收到购买资料后展示 2FA 链接和原资料图，再继续。已有账号复用；安卓只解释适用的 Google 登录用途。 |
-| vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。按 [库存核对](18-vps-stock.md) 从 DMIT cart.php 核对 AS3 Premium TINY，参考价 10.90 美元/月，缺货首推搬瓦工；再缺货看 AKILE。新购买提交 purchase_checks，依据 purchase_decision 继续；其他 DMIT 选项独立验证、说明未交付实践后由客户选择。默认月付／季付／月付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
+| vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。按 [库存核对](18-vps-stock.md) 从 DMIT cart.php 核对 AS3 Premium TINY，参考价 10.90 美元/月，缺货首推搬瓦工。新购买提交 purchase_checks，依据 purchase_decision 继续；其他 DMIT 选项独立验证、说明未交付实践后由客户选择。默认月付／季付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
 | computer_network | 客户端连接节点，TUN 接管流量，全局走选定节点；保留旧 VPN 测通后再切换。 |
 | browser | 区分 Claude 桌面版、Claude Code 与 AdsPower；电脑浏览器中的 Claude 登录、邮件链接和授权使用 AdsPower，桌面版与 CLI 可正常使用。展示桌面版权限风险说法与已交付用户正常使用反馈，并给出三站链接。 |
 | phone_proxy | iOS 手机负责首次登录与内购，Apple 处理订单及退款申请；安卓使用自己的官网付款路线。 |
@@ -177,7 +177,7 @@ python3 scripts/workflow.py change --scope timezone --reason '用户选择台北
 | 刚买好、账号一串看不懂、谷歌不知道怎么弄 | 结合购号上下文取 `google_materials`，按字段、取码、回填三张原图讲清楚；上下文不足时先确认是资料还是登录页面。 |
 | 那个码怎么用、2FA 密钥是什么、身份验证器验证码哪里拿 | `google_2fa`，直接给 https://2fa.run/ 及原取码、回填图。实际页面要求短信、恢复邮箱或备用码时用 `google_other_verification`。 |
 | 注册好了、分类找不到、买哪个号 | 按当前商家和进度选 `chuhai_register`／`chuhai_category`／`chuhai_product`；GmailBuy 使用 `gmailbuy` 与其实际页面。 |
-| 已到商家注册／套餐／付款页面 | 按商家选 `vps_dmit`／`vps_bandwagon`／`vps_akile`，用 `--step` 取当前页；已买好就继续部署。 |
+| 已到商家注册／套餐／付款页面 | 按商家选 `vps_dmit`／`vps_bandwagon`，用 `--step` 取当前页；已买好就继续部署。 |
 | 浏览器哪个框填什么 | 按当前标签页选 `browser_profile`／`browser_proxy`／`browser_fingerprint`。 |
 | 手机节点、DNS 不知道点哪里 | 按实际问题选 `phone_node`／`phone_dns`／`phone_backup`；配置分流参考用 `phone_config`。没有对应按钮图时读取客户当前页面逐步定位。 |
 | Apple 账号、充值卡不知道在哪里操作 | 按实际操作选 `apple_store`、`gift_official`、`gift_alipay`、`gift_redeem`；已准备好的部分复用。 |
