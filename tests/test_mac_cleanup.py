@@ -107,7 +107,7 @@ class CleanupTests(unittest.TestCase):
             mock.patch.object(pathlib.Path, "home", return_value=home),
             mock.patch.object(cleanup, "running_under_claude", return_value=False),
             mock.patch.object(cleanup, "claude_processes", return_value=processes or []),
-            mock.patch.object(cleanup, "current_timezone", return_value="Asia/Taipei"),
+            mock.patch.object(cleanup, "current_timezone", return_value="America/Los_Angeles"),
             mock.patch.object(sys.stdin, "isatty", return_value=True),
             mock.patch("builtins.input", side_effect=answer),
         ):
@@ -121,6 +121,7 @@ class CleanupTests(unittest.TestCase):
         self.assertFalse((home / "ClaudeBackups").exists())
         self.assertTrue((home / ".claude/cache").exists())
         self.assertEqual(len(prompts), 5)
+        self.assertFalse(any("时区" in prompt for prompt in prompts))
         self.assertFalse(any("自动清理" in prompt or "可再生缓存" in prompt for prompt in prompts))
 
     def test_running_claude_skips_safe_cleanup_without_exit_prompt(self):
@@ -137,7 +138,7 @@ class CleanupTests(unittest.TestCase):
         with (
             mock.patch.object(pathlib.Path, "home", return_value=home),
             mock.patch.object(cleanup, "running_under_claude", return_value=True),
-            mock.patch.object(cleanup, "current_timezone", return_value="Asia/Taipei"),
+            mock.patch.object(cleanup, "current_timezone", return_value="America/Los_Angeles"),
             mock.patch.object(cleanup, "claude_processes", return_value=[]),
         ):
             self.assertEqual(cleanup.main([]), 2)

@@ -332,7 +332,10 @@ def panel_listen_verified(port):
     """Read real Linux listener addresses, not merely CLI exit status."""
     listeners = []
     for name in ("tcp", "tcp6"):
-        for line in Path("/proc/net/" + name).read_text().splitlines()[1:]:
+        path = Path("/proc/net/" + name)
+        if name == "tcp6" and not path.exists():
+            continue
+        for line in path.read_text().splitlines()[1:]:
             fields = line.split()
             address, number = fields[1].split(":")
             if fields[3] == "0A" and int(number, 16) == port:

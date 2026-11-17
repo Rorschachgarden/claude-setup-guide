@@ -56,7 +56,7 @@ python3 scripts/workflow.py run --action download_karing
 
 `context` 标识本次客户、设备、节点与网络配置组合，不填账号秘密。输入发生变化会使旧证据失效。客户端网络栈、规则、旧 VPN 接管状态变化但输入没变时，先执行 `invalidate`，再重新测受影响项目。恢复对话沿用同一项目，不混用客户目录。
 
-首次 SSH 在真实终端核对主机指纹。默认 `batch_mode: true` 使用已可用的密钥／代理认证；密码登录可在真实交互终端设置 `batch_mode: false`，密码由用户在 SSH 隐藏提示输入，不能写入 JSON。用户和 SSH 端口按实际值填写；非 root 登录仅在已有 `sudo -n` 权限时设置 `sudo: true`。不能登录、缺 Python 或 sudo 不可用时先按原教程处理，不自动改 SSH 权限。
+首次 SSH 在真实终端核对主机指纹：按本次输入的 user、host、port 和适用私钥生成 `ssh -p <端口> [-i <私钥路径>] <用户>@<服务器>`，与商家控制台指纹核对一致后输入 `yes`，登录成功再退出，重试原来的 preflight。`ssh_host_key_unknown` 表示尚未完成首次确认；`ssh_host_key_changed` 先核实重装或更换服务器及新指纹，再更新对应主机记录。脚本继续使用已确认的主机指纹。默认 `batch_mode: true` 使用已可用的密钥／代理认证；密码登录可在真实交互终端设置 `batch_mode: false`，密码由用户在 SSH 隐藏提示输入，不能写入 JSON。用户和 SSH 端口按实际值填写；非 root 登录仅在已有 `sudo -n` 权限时设置 `sudo: true`。不能登录、缺 Python 或 sudo 不可用时先按原教程处理，不自动改 SSH 权限。
 
 ## 服务器与节点
 

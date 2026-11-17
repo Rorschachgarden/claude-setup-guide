@@ -167,6 +167,10 @@ def remote(action, c):
     args += [s["user"] + "@" + s["host"], shlex.join(remote_cmd)]
     r = subprocess.run(args, input=json.dumps({"action": action, "server": c["server"]}), capture_output=True, text=True,
                        timeout=420 if action == "deploy" else 70)
+    if r.returncode and 'REMOTE HOST IDENTIFICATION HAS CHANGED' in r.stderr:
+        raise Failure('ssh_host_key_changed')
+    if r.returncode and re.search(r'No .* host key is known for', r.stderr):
+        raise Failure('ssh_host_key_unknown')
     try:
         data = json.loads(r.stdout)
     except ValueError:
@@ -299,6 +303,10 @@ def execute(args, c, state):
                   "error": str(e) if isinstance(e, Failure) else type(e).__name__}
         if isinstance(e, SystemMismatch):
             result = e.result
+        if result.get('error') in ('ssh_host_key_unknown', 'ssh_host_key_changed'):
+            result['next_action'] = ('在真实终端连接同一台服务器，核对商家控制台的主机指纹，确认后输入 yes 保存，再重试原动作。' if result['error'] == 'ssh_host_key_unknown' else
+                                     '先向商家控制台核实是否重装或更换服务器及新指纹，确认后更新该主机记录，再重试原动作。')
+
         state.finish(step, result)
         state.write_report()
         return result

@@ -265,12 +265,12 @@ def validation(stage, data, state, now):
         elif rule == 'scores':
             valid = isinstance(value, dict) and set(value) == {'netcoffee', 'ping0', 'scamalytics'}
             if valid:
-                for observation in value.values():
+                for site, observation in value.items():
                     if not isinstance(observation, dict):
                         valid = False
                         break
                     score = observation.get('value')
-                    valid &= assessment('netcoffee', score) not in ('invalid', 'unverified')
+                    valid &= assessment(site, score) not in ('invalid', 'unverified')
                     valid &= isinstance(observation.get('result'), str) and bool(observation['result'].strip())
         if not valid:
             issues.append(name)

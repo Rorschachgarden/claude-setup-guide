@@ -23,6 +23,12 @@ if (root/'wrong-os').exists() and action in ('preflight', 'deploy'):
     print(json.dumps({'status': 'failed', 'error': 'server_os_mismatch',
                       'operating_system': {'id': 'ubuntu', 'version_id': '22.04', 'name': 'Ubuntu 22.04 LTS'}}))
     sys.exit(1)
+if (root/'unknown-host').exists():
+    print('No ED25519 host key is known for fixture.invalid and you have requested strict checking.', file=sys.stderr)
+    sys.exit(255)
+if (root/'changed-host').exists():
+    print('WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!', file=sys.stderr)
+    sys.exit(255)
 if (root/'fail').exists():
     print('SSH connection lost', file=sys.stderr)
     sys.exit(1)
@@ -126,6 +132,16 @@ class NetworkWorkflowTests(unittest.TestCase):
         self.assertTrue(all(s['status'] == 'stale' for s in report['steps'].values()))
         self.assertTrue(self.progress.read_text().startswith('已有客户选择\n'))
         self.assertEqual(self.progress.read_text().count('<!-- network-execution-report -->'), 1)
+
+    def test_first_host_confirmation_and_changed_key_recovery(self):
+        for marker, error in [('unknown-host', 'ssh_host_key_unknown'), ('changed-host', 'ssh_host_key_changed')]:
+            (self.fixture/marker).touch()
+            result = self.run_cli('preflight', code=1)
+            self.assertEqual(result['error'], error)
+            self.assertIn('指纹', result['next_action'])
+            self.assertFalse((self.private/'node.txt').exists())
+            (self.fixture/marker).unlink()
+            self.assertEqual(self.run_cli('preflight')['status'], 'passed')
 
     def test_failed_export_then_retry(self):
         self.run_cli('deploy')

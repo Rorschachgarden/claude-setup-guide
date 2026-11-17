@@ -177,7 +177,7 @@ class GiftRouteTests(unittest.TestCase):
         self.assertEqual(result['observed']['gift_channel'], 'alipay')
         result = self.flow.submit(self.payload({'teaching_topic':'gift_redeem'}))
         self.assertEqual(result['default_teaching']['topic'], 'gift_redeem')
-        self.assertNotIn('render.alipay.com', result['customer_message'])
+        self.assertIn('assets/images/apple/15.jpg', ' '.join(result['customer_images']))
         result = self.flow.submit(self.payload({'payment_ready':True}))
         self.assertEqual(result['stage'], 'app')
 
@@ -187,12 +187,13 @@ class GiftRouteTests(unittest.TestCase):
         data = self.data('payment_preparation'); data.update(payment_ready=False, account_origin='purchased')
         result = self.flow.submit(self.payload(data))
         self.assertEqual(result['status'], 'waiting')
-        self.assertNotIn('render.alipay.com', result.get('customer_message',''))
+        self.assertIn('以下购买与兑换图解先供您查看', result['customer_message'])
         payload = self.payload({'account_origin':'self_used','account_type':'longstanding','gift_channel':'apple_official','teaching_topic':'gift_official'})
         payload['source'] = {'kind':'user','reference':'客户明确选择苹果官网购买'}
         result = self.flow.submit(payload)
         self.assertEqual(result['default_teaching']['topic'], 'gift_official')
-        self.assertNotIn('render.alipay.com', result.get('customer_message',''))
+        self.assertNotIn('render.alipay.com', result['customer_message'])
+        self.assertTrue(all(f'assets/images/apple/{i}.jpg' in result['customer_images'] for i in range(10,14)))
 
 
 class CaptureWorkflowIntegrationTests(unittest.TestCase):

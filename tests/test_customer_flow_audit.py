@@ -726,7 +726,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('89.99 美元／三个月', message)
         self.assertIn('2 GB', message)
         action = self.flow.next()['next_action']
-        self.assertIn('维护者统一核查库存', action)
+        self.assertIn('维护者统一核查库存', self.flow.next()['purchase_instruction'])
         self.assertNotIn('vps_capture', action)
         self.assertNotIn('Hostinger', message + action)
 

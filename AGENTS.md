@@ -46,11 +46,11 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 账号复用以 Claude 的可用状态为准。Google／Gmail 能登录，但对应的 Claude 账号已被封禁时，记录 account_available=false，继续准备其他可用账号；若后来找回的账号也已被 Claude 封禁，同样按此处理。尚未用过 Claude 的 Google 账号先确认既有情况，实际登录仍留到手机网络验收后，不为回答这个问题提前登录。
 
-客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 account_available=true，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。出海91新手图使用清晰原截图配编号、箭头与文字，按当前步骤展示。
+客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 account_available=true，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。出海91新手图使用清晰原截图配编号、箭头与文字，选定商家后一次展示注册、分类和选号三张图。
 
 Windows＋iPhone／iPad 手动带做时，每轮先标明操作设备，给 1～3 个相连动作及可见完成结果。配置保存与恢复按 references/02-browser-iphone.md 第 2.2.4 节，DNS 修改按第 2.2.5 节：列表输入后加入条目、保存、退出重开回读，再重连复测。节点导入资料与 DNS／分流配置分别保存；手机本地保存为默认路径，按实际菜单定位。恢复时沿用一个明确目标，延迟回复与当前目标冲突先核对已执行动作。
 
-**默认出图：**当前操作有对应图解就直接展示在聊天中，配简短步骤和完成标志。用户说不会、找不到、没看懂或图片未显示时，结合上下文重新取图讲解，已有展示标记不抑制求助。各阶段读取 `teaching_topics`，按当前小步骤运行 `python3 scripts/workflow.py guide --topic <主题ID> [--step <图片序号>]`；先前进度已到后续步骤就取该步图，主题不明确时只补问一个关键问题。`guide` 只读，讲解后接回原阶段。完整用法与口语例子见 references/17-workflow-controller.md 的「默认出图与重复求助」。
+**默认出图：**首次进入阶段，在聊天中按顺序展示该阶段适用的全部原图，配中文说明和当前起点。商家或渠道确定后立即给齐该分支整套图；设备、商家和渠道按实际选择匹配。图片全部提前展示，实际操作与验收仍按原阶段推进。用户说不会、找不到、没看懂或图片未显示时，立即重讲对应图。`guide --topic <主题ID>` 默认返回整组，`--step <图片序号>` 用于后续定位重讲；教学位置不缩减首次阶段图集。完整用法见 references/17-workflow-controller.md 的「默认出图与重复求助」。
 
 礼品卡默认首推支付宝：完成账户与等待安排后，直接展示 `guide --topic gift_alipay` 的备忘录跳转链接、原图和操作步骤，省去支付宝搜索入口；进入小程序后继续原购买与兑换教程。
 

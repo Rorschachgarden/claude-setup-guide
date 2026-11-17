@@ -277,7 +277,6 @@ def main(argv: list[str] | None = None) -> int:
         keychain = ask_yes("删除钥匙串 Claude Code-credentials（会退出 CLI 登录）？")
         desktop_mode = ask_choice("Claude Desktop：0 保留；1 清登录态/持久数据；2 再移除应用。选择 [0]：", {0, 1, 2})
         simple_mode = ask_choice("精简模式：0 保持；1 启用 CLAUDE_CODE_SIMPLE；2 移除该设置。选择 [0]：", {0, 1, 2})
-        set_timezone = current_timezone() != "Asia/Taipei" and ask_yes("把 macOS 时区改为 Asia/Taipei？")
         risky = rotate or keychain or desktop_mode or simple_mode
         clean_safe = not processes
         if processes and risky:
@@ -297,7 +296,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"2. {action} {len(safe)} 项缓存/日志。")
         for target in targets:
             print(f"   - {target}")
-        print(f"3. 身份轮换：{'是' if rotate else '否'}；删除钥匙串：{'是' if keychain else '否'}；精简模式：{simple_mode}；修改时区：{'是' if set_timezone else '否'}")
+        print(f"3. 身份轮换：{'是' if rotate else '否'}；删除钥匙串：{'是' if keychain else '否'}；精简模式：{simple_mode}；时区保持原值")
         print("绝不清理 sessions、projects、history、skills、plugins、hooks、commands、agents、MCP、设置文件或任何项目/Git/Codex 数据。")
         print("所有移除只进废纸篓；遥测键逐值保持不变。")
         if input("完全理解后输入 CONFIRM 开始；其他输入取消：").strip() != "CONFIRM":
@@ -308,9 +307,6 @@ def main(argv: list[str] | None = None) -> int:
         protected_before = [claude / name for name in PROTECTED if (claude / name).exists() or (claude / name).is_symlink()]
         backup = create_backup(home)  # 第一个写操作
         print(f"\n[1/6] 全量备份已校验：{backup}")
-        if set_timezone:
-            print("[人工步骤] 仅在终端原生 sudo 隐藏提示中输入 Mac 开机密码；脚本不会读取或保存密码。")
-            subprocess.run(["sudo", "-v"], check=True)
         print(f"[2/6] 身份轮换：同步 {rotate_identity(home)} 份内部备份" if rotate else "[2/6] 身份保持不变")
         if keychain:
             result = subprocess.run(["security", "delete-generic-password", "-s", "Claude Code-credentials"], capture_output=True, text=True, check=False)
@@ -323,10 +319,6 @@ def main(argv: list[str] | None = None) -> int:
         if simple_mode:
             update_simple(home, simple_mode)
         print(f"[5/6] 精简模式：{('保持', '启用', '移除')[simple_mode]}")
-        if set_timezone:
-            subprocess.run(["sudo", "/usr/sbin/systemsetup", "-settimezone", "Asia/Taipei"], check=True)
-            if current_timezone() != "Asia/Taipei":
-                raise RuntimeError("时区修改后验证失败")
         if telemetry(read_json(settings, {})) != before_telemetry:
             raise RuntimeError("遥测设置发生变化，已停止")
         missing = [path for path in protected_before if not (path.exists() or path.is_symlink())]

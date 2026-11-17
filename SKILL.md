@@ -97,12 +97,12 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 ## 图文与资料复用
 
-每轮按 reading 读取当前小节，完整诊断用 `next --full`，固定规则用 `policy`。购买、配置、礼品卡兑换和订阅主动展示原教程对应图片，先核对内容和当前页面，再用本地图片绝对路径嵌入聊天。每次一个小目标，通常一张图。没有对应图时按实际页面指导。
+每轮按 reading 读取当前小节，完整诊断用 `next --full`，固定规则用 `policy`。购买、配置、礼品卡兑换和订阅主动展示原教程对应图片，先核对内容和当前页面，再用本地图片绝对路径嵌入聊天。阶段开始先把适用整套图解给齐，标明当前操作起点。没有对应图时按实际页面指导。
 
 PDF 位于 `assets/reading/`，给客户阅读；AI 按 Markdown 和控制层执行。开场说明与保存选择按阅读版章节完成，已有选择复用。找 PDF 内容时实际核对篇目和页码。进度和凭据只保存在 `.local/`，不提交到仓库。
 
 账号复用以 Claude 的可用状态为准。Google／Gmail 能登录，但对应的 Claude 账号已被封禁时，记录 account_available=false，继续准备其他可用账号；若后来找回的账号也已被 Claude 封禁，同样按此处理。尚未用过 Claude 的 Google 账号先确认既有情况，实际登录仍留到手机网络验收后，不为回答这个问题提前登录。
 
-客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 account_available=true，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。出海91新手图使用清晰原截图配编号、箭头与文字，按当前步骤展示。
+客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 account_available=true，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。出海91新手图使用清晰原截图配编号、箭头与文字，选定商家后一次展示注册、分类和选号三张图。
 
-**默认出图：**当前操作有对应图解就直接展示在聊天中，配简短步骤和完成标志。用户说不会、找不到、没看懂或图片未显示时，结合上下文重新取图讲解，已有展示标记不抑制求助。各阶段读取 `teaching_topics`，按当前小步骤运行 `python3 scripts/workflow.py guide --topic <主题ID> [--step <图片序号>]`；先前进度已到后续步骤就取该步图，主题不明确时只补问一个关键问题。`guide` 只读，讲解后接回原阶段。完整用法与口语例子见 references/17-workflow-controller.md 的「默认出图与重复求助」。
+**默认出图：**首次进入阶段，在聊天中按顺序展示该阶段适用的全部原图，配中文说明和当前起点。商家或渠道确定后立即给齐该分支整套图；设备、商家和渠道按实际选择匹配。图片全部提前展示，实际操作与验收仍按原阶段推进。用户说不会、找不到、没看懂或图片未显示时，立即重讲对应图。`guide --topic <主题ID>` 默认返回整组，`--step <图片序号>` 用于后续定位重讲；教学位置不缩减首次阶段图集。完整用法见 references/17-workflow-controller.md 的「默认出图与重复求助」。

@@ -2,6 +2,7 @@
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import unittest
+from unittest.mock import patch
 import test_workflow as fixtures
 from vps_purchase import TARGETS, evaluate
 from workflow import WorkflowError
@@ -83,7 +84,8 @@ class PurchaseEvidenceTests(unittest.TestCase):
         self.assertTrue(evaluate({'dmit': observation()}, NOW)['can_purchase'])
 
     def test_skip_first_vendor_is_not_accepted(self):
-        self.assertEqual(evaluate({'bandwagon': observation('bandwagon')}, NOW)['vendor'], 'dmit')
+        with patch('vps_purchase.CURRENT_OFFER', None):
+            self.assertEqual(evaluate({'bandwagon': observation('bandwagon')}, NOW)['vendor'], 'dmit')
 
     def test_other_dmit_stock_keeps_bandwagon_recommendation_and_waits_for_choice(self):
         checks = {'dmit': observation(status='sold_out'), 'bandwagon': observation('bandwagon')}

@@ -41,11 +41,28 @@ CURRENT_INSTRUCTION = ('维护者统一核查库存，当前直接向客户推�
     'DMIT优先的原规则保留，维护者调整当前推荐后再启用。已有VPS按原流程复用。')
 
 
+def observation_target(vendor, item):
+    if CURRENT_OFFER and vendor == CURRENT_OFFER['vendor'] and isinstance(item, dict) and item.get('plan') == CURRENT_OFFER['plan']:
+        return {key: CURRENT_OFFER[key] for key in ('plan', 'network', 'cycle', 'url')}
+    return TARGETS[vendor]
+
+
 def default_offer(checks, errors):
     outcomes = []
-    for vendor, target in TARGETS.items():
+    current_check = False
+    vendors = list(TARGETS)
+    if CURRENT_OFFER and CURRENT_OFFER['vendor'] in checks:
+        vendor = CURRENT_OFFER['vendor']
+        item = checks[vendor]
+        if set(checks) == {vendor} or isinstance(item, dict) and item.get('plan') == CURRENT_OFFER['plan']:
+            vendors = [vendor]
+            current_check = isinstance(item, dict) and item.get('plan') == CURRENT_OFFER['plan']
+    for vendor in vendors:
         item = checks.get(vendor)
+        target = observation_target(vendor, item)
         result = {'vendor': vendor, **target, 'can_purchase': False, 'checked': outcomes}
+        if current_check:
+            result['source'] = 'current_offer_check'
         if vendor not in checks:
             return {**result, 'status': 'check_required'}
         reason = errors[vendor]
@@ -59,7 +76,7 @@ def default_offer(checks, errors):
                 'amount': item['amount'], 'currency': item['currency'],
                 'renewal_amount': item['renewal_amount'], 'checked_at': item['checked_at'],
                 'order_url': item['url']}
-    return {'status': 'no_verified_offer', 'can_purchase': False, 'checked': outcomes}
+    return {**(result if current_check else {}), 'status': 'no_verified_offer', 'can_purchase': False, 'checked': outcomes}
 
 
 def evaluate(checks, now, *, alternatives=None, choice=None, captures=None):
@@ -139,7 +156,7 @@ def capture_error(vendor, item, captures):
 def check_observation(vendor, item, now, *, target=None):
     if not isinstance(item, dict):
         return 'page_observation_required'
-    target = target or TARGETS[vendor]
+    target = target or observation_target(vendor, item)
     if item.get('plan') != target['plan'] or item.get('network') != target['network']:
         return 'target_mismatch'
     try:
@@ -168,7 +185,7 @@ def check_observation(vendor, item, now, *, target=None):
     status = item.get('status')
     page = item.get('page')
     text = re.sub(r'\s+', '', item['evidence']).lower()
-    identity = ('usca_9', '1gb') if vendor == 'bandwagon' else (target['plan'].lower(),)
+    identity = ('usca_9', target['plan'].split('-')[-1].lower()) if vendor == 'bandwagon' else (target['plan'].lower(),)
     plan_matches = all(token in text for token in identity)
     if status in ('unknown', 'login_required'):
         return None if page in ('challenge', 'error', 'login') and (status != 'login_required' or page == 'login') else 'page_status_mismatch'

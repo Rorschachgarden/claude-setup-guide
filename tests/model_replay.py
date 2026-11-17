@@ -32,6 +32,28 @@ CASES = {
     'alipay': ('payment_preparation', '支付宝里面根本找不到你说的礼品卡小程序，搜了几次都没有，怎么办？'),
 }
 JOURNEYS = {
+    'support_recovery': ('payment_preparation', [
+        '购买时 Apple 提示购买受限，需要联系客服，先带我处理这个问题。',
+        '客服已经处理，购买限制已解除，没有新的重试等待。继续购买礼品卡。']),
+    'phone_account_swap': ('phone_proxy', [
+        'App Store 已换成我自己一直正常使用的老美区账号，代号 apple-new，已登录成功。小火箭节点、路由都没有改，VPN 还没打开。',
+        '现在已打开 VPN，仍选中同一台 VPS 的 node-a，全局路由为代理，手机节点连接成功。继续。']),
+    'vps_recheck': ('vps', [
+        '推荐的搬瓦工 2 GB、89.99 美元季付页面显示缺货，请核对这次页面快照。我还没购买。',
+        '卖家通知恢复了，请重新核对当前页面快照里的 2 GB 套餐和费用。',
+        '已经买好这个 2 GB 季付套餐，系统 Debian 12，洛杉矶，节点代号 node-a，时区 America/Los_Angeles，SSH 访问也准备好了。请接下一步，暂不实际连接。']),
+    'first_ssh': ('server', [
+        '新 VPS 的访问资料已经放好，请按程序做部署前检查。',
+        '已在真实终端与控制台核对指纹，输入 yes 保存，SSH 登录成功，系统是 Debian 12。请重试检查并继续部署。']),
+    'cleanup_scope': ('cleanup', [
+        '这台 Mac 用过被封的 Claude 账号，请先说明清理操作，本轮先不要执行清理；我现在的系统时区是洛杉矶。',
+        '我已按清理步骤完成备份和清理，Claude 桌面端和 CLI 残留已处理，系统时区保持原值。继续后续流程。']),
+    'missing_score': ('browser', [
+        '两个检测站的数值已提供，NetCoffee 一直超时，缺的这一个先算了吧，我同意继续。',
+        'NetCoffee 恢复了，同一个 AdsPower 环境实际测到 85；Ping0 风险 20，Scamalytics 风险 5。其他刚才已经验收的配置和环境都没变，请记录并继续。']),
+    'browser_swap': ('browser', [
+        '我把原来的 AdsPower 环境换成新建的 browser-b，刚创建，设置还没做。前面桌面端和浏览器的使用说明我已看明白，不用再重复。',
+        'browser-b 已保存并打开，HTTP 代理和指纹设置完成，禁止网页定位，已在这个环境检查出口一致、HTTPS、DNS、IPv6、WebRTC 和断线恢复。NetCoffee 85、Ping0 20、Scamalytics 5，均为刚才实际检测，请继续。']),
     'cross_stage_google': ('google', [
         '我有好几个以前的 Gmail，都没有注册过 Claude。不记得密码和手机号是否使用了，注册 Claude 需要这些吗？我的 Mac 默认是已经登录上的。',
         'Mac 登录的是 Gmail，不是 Claude。手机号是 +86，密码还没找到。那注册 Claude 要不要外国手机号？',
@@ -50,11 +72,24 @@ JOURNEYS = {
         '已经在这个美区 Apple 账户兑换成功，余额也确认足够了。']),
     'vps': ('vps', [
         '没有 VPS，按你们默认推荐帮我选。',
-        '就选你推荐的搬瓦工这档，商家默认是 Ubuntu 22.04，系统怎么选？',
+        '我打开注册页面了，英文看不懂，First Name、Last Name和地址怎么填？',
+        '表单填好了。',
+        '注册成功并登录 Client Area 了，商家系统默认选的是 Ubuntu 22.04，系统怎么选？',
         '已经按 Debian 12 买好了洛杉矶 VPS，标签 node-demo，时区 America/Los_Angeles，SSH访问也准备好了。这轮先给下一步，暂不执行服务器连接。']),
     'server': ('server', [
         '服务器已经买好，SSH资料已放在项目输入文件里了，请按程序检查后部署。',
         '我已经按你说的完成 Debian 12 重装，原 SSH 访问已经恢复，请重新检查并继续部署。']),
+    'phone_gallery': ('phone_proxy', [
+        '电脑这边已经完成了，现在开始配置我的 iPhone，怎么做？',
+        '那个小火箭配置的图没看懂，再解释一下。',
+        '小火箭已经安装，已导入并选中 node-a，连接的是同一台 VPS，全局路由选代理，VPN 已开启，节点连接成功。下一步呢？']),
+    'login_gallery': ('login', [
+        '手机网络已经验收通过，现在开始登录 Claude，怎么操作？',
+        '现在要求身份验证器验证码，我还是不知道怎么用。',
+        '已经用准备好的 Google 账号在 Claude App 登录成功，账号代号 claude-main。我知道之后电脑网页授权要用已配置的 AdsPower，继续订阅。']),
+    'mac_gallery': ('computer_network', [
+        '服务端已配置完成，现在开始配置我的 Mac，怎么做？',
+        'Karing 的图还是没看懂，你重新说明一下。']),
     'network': ('computer_network', [
         'Windows客户端已配置：系统代理关闭，TUN开启，全局模式，旧VPN已关闭，断线测试和恢复完成，Codex回复正常。HTTP入口和目标出口已放在输入文件里，请实际检测后继续。',
         '刚才客户端选错了节点，现在已选回目标节点，HTTP入口不变。系统代理关闭、TUN和全局开启、旧VPN已关闭，断线恢复和Codex回复都正常。请重新检测，测通再继续。']),
@@ -73,6 +108,9 @@ def fixture_main():
     check(ROOT, 'network:' + action + (':' + route if route else ''))
     config(ROOT / '.local/network/input.json')
     try:
+        if (ROOT / '.local/fixtures/ssh-unknown').exists():
+            print(json.dumps({'status':'failed','error':'ssh_host_key_unknown','next_action':'先在真实终端核对并保存服务器主机指纹，再重试原动作。'}))
+            return 1
         if action == 'probe':
             passed = read_json(ROOT / '.local/fixtures/probe.json')['passed']
             result = {'status':'passed' if passed else 'failed', 'route':route,
@@ -105,8 +143,17 @@ def prepare(root, name, stage):
         shutil.copy2(ROOT/filename,root/filename)
     fixture=fixtures.WorkflowTests(); fixture.setUp()
     try:
-        fixture.computer='mac' if name=='cross_stage_google' else 'windows'; fixture.now=datetime.now(timezone.utc)
+        fixture.computer='mac' if name in ('mac_gallery','cross_stage_google') else 'windows'; fixture.now=datetime.now(timezone.utc)
+        if name=='cleanup_scope':
+            fixture.flow.submit(fixture.payload({'banned_login':'yes'}))
         fixture.reach(stage)
+        if name=='phone_account_swap':
+            fixture.flow.submit(fixture.payload({'node_label':'node-a','client':'Shadowrocket','client_available':True,'global_route':True,'vpn_connected':False,
+                'apple_account_ref':'apple-old','account_origin':'purchased','account_type':'new','first_used_at':fixture.first_used_at.isoformat(),'store_signed_in':True,'apple_reminder_shown':True}))
+        if name in ('missing_score','browser_swap'):
+            data=fixture.data('browser')
+            data['scores']['netcoffee']={'value':None,'result':'检测网站超时，另外两站正常'}
+            fixture.flow.submit(fixture.payload(data))
         if name=='bought':
             fixture.flow.submit(fixture.payload({'account_available':False,'purchase_channel':'chuhai91'}))
         if stage=='payment_preparation':
@@ -118,7 +165,7 @@ def prepare(root, name, stage):
         fixture.doCleanups()
     version=json.loads((root/'version.json').read_text())['version']
     cache_check(root,version,failed_check(version),time.time())
-    if name=='vps':
+    if name in ('vps','vps_recheck'):
         folder=root/'.local/fixtures'; folder.mkdir()
         pages={
             'dmit': {'url':'https://www.dmit.io/cart.php?region=los-angeles&network=premium&generation=as3',
@@ -126,11 +173,16 @@ def prepare(root, name, stage):
             'bandwagon': {'url':'https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9',
                          'text':'Configure Product\nUSCA_9 Memory 1 GB\nBilling Cycle\nQuarterly $49.99 USD\nRenewal $49.99 USD Quarterly\nContinue'},
         }
+        if name=='vps_recheck':
+            pages['bandwagon']['text']='USCA_9 2 GB Out of Stock'
         for vendor,page in pages.items(): (folder/(vendor+'.json')).write_text(json.dumps(page))
-    if name in ('server','network'):
+    if name in ('server','network','first_ssh'):
         folder=root/'.local/fixtures'; folder.mkdir()
         (folder/'os-release').write_text('ID=ubuntu\nVERSION_ID="22.04"\nPRETTY_NAME="Ubuntu 22.04 LTS"\n')
         (folder/'probe.json').write_text('{"passed":false}')
+        if name=='first_ssh':
+            (folder/'os-release').write_text('ID=debian\nVERSION_ID="12"\nPRETTY_NAME="Debian GNU/Linux 12"\n')
+            (folder/'ssh-unknown').touch()
         network=root/'.local/network'; network.mkdir(exist_ok=True)
         (network/'input.json').write_text(json.dumps({'context':'isolated-replay',
             'ssh':{'host':'203.0.113.10','user':'root'},
@@ -176,7 +228,7 @@ def run_turn(root, message, transcript, prefix, model, timeout, snapshots=False)
     return code,response,commands
 
 
-def assess(root, name, turn, response, commands, before, code):
+def assess(root, name, turn, response, commands, before, code, transcript=()):
     view=Workflow(root).next(); stage=view['stage']
     checks={'model_completed':code==0,'workflow_called':any('workflow.py' in c for c in commands),
             'response_present':bool(response.strip()),'source_unchanged':source_hashes(root)==before}
@@ -203,7 +255,7 @@ def assess(root, name, turn, response, commands, before, code):
             checks['vps_next_step']='VPS' in response and '89.99' in response
     elif name=='computer_first':
         checks.update(phone_question=any(x in response for x in ('iPhone','安卓','手机类型')),stage_preserved=stage=='devices')
-    elif name=='system' or name=='vps' and turn==1:
+    elif name=='system' or name=='vps' and turn==3:
         checks.update(debian_recommended='Debian 12' in response,stage_preserved=stage=='vps')
     elif name=='stock':
         checks.update(stock_not_invented=not view['purchase_decision']['can_purchase'],
@@ -215,8 +267,49 @@ def assess(root, name, turn, response, commands, before, code):
                           actual_price='89.99' in response,stage_preserved=stage=='vps',
                           maintainer_offer=decision.get('source')=='maintainer',
                           no_customer_stock_lookup=not any(r['action']=='vps_capture' for r in Workflow(root).state['receipts']))
+        elif turn in (1,2):
+            checks['registration_does_not_complete_vps']=stage=='vps' and 'access_ready' in view['missing']
+            if turn==1:
+                checks['english_fields_explained']='First Name' in response and 'Last Name' in response
+                checks['registration_form_picture']=picture('/vps-purchase/bandwagon-register-2.png')
         else:
             checks['server_handoff']=stage=='server' and 'server_readback' in view['missing']
+    elif name=='support_recovery':
+        view=Workflow(root).next()
+        checks['expected_stage']=stage=='payment_preparation'
+        checks['support_state']=view.get('status')=='needs_support' if turn==0 else view.get('status')!='needs_support'
+        if turn==0:
+            checks['support_gallery']=all(picture(f'/images/apple/{i}.jpg') for i in (18,19))
+        else:
+            checks['normal_gallery']=all(picture(f'/images/apple/{i}.jpg') for i in (14,15)) and not any(picture(f'/images/apple/{i}.jpg') for i in (18,19))
+    elif name=='phone_account_swap':
+        data=Workflow(root).state['records']['phone_proxy']['data']
+        checks['proxy_preserved']=data.get('node_label')=='node-a' and data.get('client')=='Shadowrocket' and data.get('global_route') is True
+        checks['new_account_recorded']=data.get('apple_account_ref')=='apple-new' and data.get('account_origin')=='self_used'
+        checks['expected_stage']=stage==('phone_proxy' if turn==0 else 'timezone')
+    elif name=='vps_recheck':
+        flow=Workflow(root)
+        decision=flow.purchase_decision(flow.state['records']['vps']['data'])
+        checks['capture_used']=any(r['action']=='vps_capture' for r in flow.state['receipts'])
+        checks['expected_purchase_state']=(not decision['can_purchase']) if turn==0 else decision['can_purchase'] and decision['plan']=='USCA_9-2GB'
+        checks['expected_stage']=stage==('server' if turn==2 else 'vps')
+    elif name=='first_ssh':
+        receipts=Workflow(root).state['receipts']
+        if turn==0:
+            checks.update(unknown_host_recorded=any(r['result'].get('error')=='ssh_host_key_unknown' for r in receipts), stage_preserved=stage=='server', confirmation_explained='指纹' in response)
+        else:
+            checks.update(deployment_readback=any(r['action']=='server_deploy' and r['success'] for r in receipts),client_handoff=stage=='computer_network')
+    elif name=='cleanup_scope':
+        checks['expected_stage']=stage==('cleanup' if turn==0 else 'devices')
+        checks['no_early_timezone_change']=not any('settimezone' in command for command in commands)
+    elif name in ('missing_score','browser_swap'):
+        checks['expected_stage']=stage==('browser' if turn==0 else 'phone_proxy')
+        data=Workflow(root).state['records']['browser']['data']
+        if name=='browser_swap':
+            checks['usage_explanation_retained']=data.get('usage_explained') is True
+            checks['new_profile_verification']=data.get('checked_profile_ref')==data.get('profile_ref') if turn==1 else not data.get('proxy_configured')
+        else:
+            checks['third_site_required']=data['scores']['netcoffee']['value'] is None if turn==0 else data['scores']['netcoffee']['value']==85
     elif name=='server':
         receipts=Workflow(root).state['receipts']
         if turn==0:
@@ -246,6 +339,31 @@ def assess(root, name, turn, response, commands, before, code):
             checks.update(redeem_picture=picture('/images/apple/15.jpg'),stage_preserved=stage=='payment_preparation')
         else:
             checks.update(balance_confirmed=data.get('payment_ready') is True,app_handoff=stage=='app')
+    if turn==0 and name in ('vps','gift','server','network','phone_gallery','login_gallery','mac_gallery'):
+        required={
+            'vps':[f'/vps-purchase/bandwagon-register-{i}.png' for i in range(1,5)]+['/vps-purchase/bandwagon-plan.png'],
+            'gift':[f'/images/apple/{i:02}.jpg' for i in (14,15)],
+            'server':[f'/images/network/{i}.jpg' for i in range(10,15)],
+            'network':[f'/images/network/{i:02}.jpg' for i in (1,2,15,16,17)],
+            'phone_gallery':['/images/network/14.jpg','/images/browser-iphone/10.jpg'],
+            'login_gallery':[],
+            'mac_gallery':[f'/images/network/{i:02}.jpg' for i in (1,2,19,20)],
+        }[name]
+        checks['complete_stage_gallery']=all(picture(p) for p in required)
+        checks['no_unsolicited_support_images']=not any('/images/apple/'+p in x for x in images for p in ('18.jpg','19.jpg'))
+        if name=='login_gallery':
+            checks['no_purchased_order_for_personal_account']=not picture('/google-account/01-order-original.png')
+        if name=='phone_gallery':
+            checks['no_unrelated_account_images']=not any(picture(f'/images/apple/{i:02}.jpg') for i in range(1,10))
+    if name=='network' and turn==1:
+        checks['complete_browser_gallery']=all(picture(f'/images/browser-iphone/0{i}.png') for i in (1,2,3))
+    if name=='google' and turn==1:
+        shown=response+'\n'+'\n'.join(item['assistant'] for item in transcript)
+        checks['complete_seller_gallery']=all('/chuhai91/'+p in shown for p in ('01-register.png','02-google-aged-category.png','03-us-ip-product.png'))
+        checks['new_purchase_preview']=all(picture('/google-account/'+p+'-original.png') for p in ('01-order','02-2fa','03-google-code'))
+    if name in ('phone_gallery','login_gallery','mac_gallery'):
+        expected = {'phone_gallery':'phone_proxy','login_gallery':'login','mac_gallery':'computer_network'}[name] if turn<2 else {'phone_gallery':'timezone','login_gallery':'subscription'}[name]
+        checks['stage_preserved']=stage==expected
     return {'case':name,'turn':turn+1,'passed':all(checks.values()),'checks':checks,'stage':stage}
 
 
@@ -265,14 +383,20 @@ def main():
         with tempfile.TemporaryDirectory(prefix='claude-replay-') as temp:
             root=Path(temp); prepare(root,name,stage); before=source_hashes(root); transcript=[]
             for turn,message in enumerate(messages):
+                if turn==1 and name=='vps_recheck':
+                    p=root/'.local/fixtures/bandwagon.json'; page=json.loads(p.read_text())
+                    page['text']='Configure Product\nUSCA_9 2 GB\nBilling Cycle\nQuarterly $89.99 USD\nRenewal $89.99 USD Quarterly\nContinue'
+                    p.write_text(json.dumps(page))
+                if turn==1 and name=='first_ssh':
+                    (root/'.local/fixtures/ssh-unknown').unlink()
                 if turn==1 and name=='server':
                     (root/'.local/fixtures/os-release').write_text('ID=debian\nVERSION_ID="12"\nPRETTY_NAME="Debian GNU/Linux 12"\n')
                 if turn==1 and name=='network':
                     (root/'.local/fixtures/probe.json').write_text('{"passed":true}')
                 fixture_before = {str(p): p.read_bytes() for p in (root/'.local/fixtures').glob('*') if p.is_file()}
                 prefix=args.output/(name+'-'+str(turn+1))
-                code,response,commands=run_turn(root,message,transcript,prefix,args.model,args.timeout,False)
-                result=assess(root,name,turn,response,commands,before,code)
+                code,response,commands=run_turn(root,message,transcript,prefix,args.model,args.timeout,name=='vps_recheck')
+                result=assess(root,name,turn,response,commands,before,code,transcript)
                 result['checks']['fixture_unchanged'] = all(Path(p).is_file() and Path(p).read_bytes()==content for p,content in fixture_before.items())
                 result['passed'] = all(result['checks'].values())
                 result.update(model=args.model or 'configured_default',exit_code=code,input=message)
@@ -280,7 +404,7 @@ def main():
                 prefix.with_suffix('.state.json').write_text(json.dumps(Workflow(root).state,ensure_ascii=False,indent=2))
                 print(json.dumps(result,ensure_ascii=False),flush=True)
                 (args.output/'summary.json').write_text(json.dumps(summaries,ensure_ascii=False,indent=2))
-                if code: break
+                if code: return 1
     return int(not all(r['passed'] for r in summaries))
 
 

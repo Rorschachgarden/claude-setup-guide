@@ -5,9 +5,10 @@ from network_server import SERVER_OS_INSTRUCTION
 from vps_purchase import DMIT_DESCRIPTION
 
 ROOT = Path(__file__).resolve().parents[1]
+ALIPAY_URL = 'https://render.alipay.com/p/s/i/?scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D2021001165662428%26page%3Dpages%252Fredirect%252Fredirect%253FappId%253D2021003191605547%26enbsv%3D0.2.2507280946.43%26chInfo%3Dch_share__chsub_CopyLink%26fxzjshareChinfo%3Dch_share__chsub_CopyLink%26apshareid%3DA6364F5A-E354-477C-A944-0B4A1390FC24%26shareBizType%3DH5App_XCX%26shareTimestamp%3D1772934191191'
 GOOGLE_IMAGES = [f'assets/google-account/{name}-original.png' for name in
                  ('01-order', '02-2fa', '03-google-code')]
-POLICY = ('当前操作有对应图解就默认在聊天直接展示，配 1～3 个动作和完成标志；按当前小步骤逐张展示。'
+POLICY = ('当前操作有对应图解就默认在聊天直接展示，首次进入阶段就按顺序给齐该阶段适用的全部图解，配中文说明与当前起点；商家或渠道确定后立即给齐该分支整套图。整套已展示后按当前进度继续，求助时重讲对应页。'
           '用户说不会、找不到、没看懂、再讲一次或图片没显示时，结合当前页面和上下文重新取对应图并拆细说明，'
           '已讲过的标记不抑制本次求助。内容明确就直接讲；无法区分账号、验证码类型或操作设备时只问一个关键问题。'
           '教学只解释当前问题，不提交成功结果、不改变阶段；实际登录、充值和付款仍按当前流程执行。')
@@ -42,15 +43,15 @@ CARDS = {
     'google_login': card('从手机 Claude 进入 Google 登录', 'login', '08-google-account.md', instruction='打开手机官方 Claude 的 Google 登录入口，输入准备好的账号。看当前验证页面，身份验证器用 google_2fa，短信／恢复邮箱／备用码用 google_other_verification。'),
     'google_other_verification': card('短信、恢复邮箱或备用码验证', 'login', '08-google-account.md', instruction='先辨认页面要求的验证方式，说明去哪里取得对应验证码；这类输入框按实际页面完成。需要更换验证方式时查看页面的“尝试其他方式”。'),
     'vps_dmit': card('DMIT 选购与开通', 'vps', '01-network.md', pics('images/network', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08-redacted.png'),
-                     '按当前小步骤选图：套餐、系统、订单、结算、服务器资料；原图 AN5 与 9.99 美元作界面示例，当前默认已交付套餐为 ' + DMIT_DESCRIPTION + '。库存从 cart.php 读取，按 references/18-vps-stock.md 核对及选择后再给付款指引。' + SERVER_OS_INSTRUCTION),
+                     '先展示套餐、系统、订单、结算、服务器资料整组图，指出当前操作；原图 AN5 与 9.99 美元作界面示例，当前默认已交付套餐为 ' + DMIT_DESCRIPTION + '。库存从 cart.php 读取，按 references/18-vps-stock.md 核对及选择后再给付款指引。' + SERVER_OS_INSTRUCTION),
     'vps_bandwagon': card('搬瓦工注册与购买', 'vps', '09-vps-purchase.md', pics('vps-purchase', 'bandwagon-register-1.png', 'bandwagon-register-2.png', 'bandwagon-register-3.png', 'bandwagon-register-4.png', 'bandwagon-plan.png'),
-                         '按客户当前注册或选套餐页面选择对应的一张图，已有账号直接进入选套餐步骤。'),
+                         '先展示四张注册中文图和一张套餐图，按顺序对应：入口、姓名邮箱密码、联系地址、条款提交、选套餐。打开 https://bandwagonhost.com/register.php 。First Name 填名，Last Name 填姓，Email Address 填常用邮箱，Password 与 Confirm Password 填同一密码；Country or territory、地址和电话填本人真实资料。用户阅读条款并完成验证，能进入 Client Area 才算注册完成。已有账号从第5张图继续；图中旧价格作界面示例，实际套餐与费用按本次已核实结果。'),
     'server_panel': card('服务端面板和节点参数', 'server', '01-network.md', pics('images/network', '10.jpg', '11.jpg', '12.jpg', '13.jpg'),
-                        '按面板、创建节点及参数页选图；由 Codex 使用部署工具时说明当前结果，需要客户手动操作再按图带做。'),
+                        '先给齐面板、创建节点及参数页图解；由 Codex 使用部署工具时说明当前结果，需要客户手动操作再按图带做。'),
     'node_export': card('找到节点导出入口', 'server phone_proxy', '01-network.md', pics('images/network', '14.jpg'),
                         '这张图是服务端导出入口；用户自己的节点二维码由本次部署生成，在电脑打开供手机扫描。'),
     'windows_client': card('Windows v2rayN 界面与连接检查', 'computer_network', '10-windows.md', pics('images/network', '15.jpg', '16.jpg', '17.jpg'),
-                           '按当前动作选择主窗口、下载安装或延迟界面图；结合实际版本定位，延迟结果后继续检查 HTTPS 和出口。', computer='windows'),
+                           '先给齐主窗口、下载安装和延迟界面图；结合实际版本定位，延迟结果后继续检查 HTTPS 和出口。', computer='windows'),
     'mac_client': card('Mac Karing 配置', 'computer_network', '01-network.md', pics('images/network', '19.jpg', '20.jpg'),
                        '按 Mac Karing 当前页面带做，连接后核对实际出口和系统接管。', computer='mac'),
     'browser_profile': card('新建 AdsPower 环境', 'browser', '02-browser-iphone.md', pics('images/browser-iphone', '01.png'),
@@ -68,13 +69,13 @@ CARDS = {
     'network_check': card('在手机核对出口与检测结果', 'phone_network', '06-before-login.md', instruction='手机浏览器打开 https://ping0.cc/ 核对当前出口，再按章节检查三站、DNS 与 IPv6；先确认手机使用 Wi-Fi 还是蜂窝网络。'),
     'android_phone': card('安卓手机导入与检查', 'phone_proxy timezone phone_network', '11-android-web-pay.md', instruction='按安卓实际页面操作，复用服务器节点；时区、网络及付款使用安卓分支。', phone='android'),
     'apple_register': card('注册美区 Apple 账户', 'phone_proxy payment_preparation', '03-apple.md', pics('images/apple', '01.jpg', '02.jpg'),
-                           '客户选择自行注册后，按当前表单展示对应图，填写本人信息并完成验证。', phone='apple'),
+                           '客户选择自行注册后，先展示注册整组图，填写本人信息并完成验证。', phone='apple'),
     'apple_region': card('查看或调整 Apple 账户地区', 'phone_proxy payment_preparation', '03-apple.md', pics('images/apple', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg'),
-                         '先核对现有国家／地区；明确选择改区后再按实际进度展示后续图，原图的地址和支付示例按本人资料处理。', phone='apple'),
+                         '先核对现有国家／地区；提前给齐地区核对与改区图，明确选择改区后再操作，原图的地址和支付示例按本人资料处理。', phone='apple'),
     'apple_store': card('在 App Store 登录账户', 'phone_proxy payment_preparation', '03-apple.md', pics('images/apple', '09.jpg'),
                         '本步操作 App Store，手机原有 iCloud 保持原样；完成后核对 App Store 账户，记录首次登录时间。', phone='apple'),
     'gift_official': card('苹果官网购买礼品卡', 'payment_preparation', '03-apple.md', pics('images/apple', '10.jpg', '11.jpg', '12.jpg', '13.jpg'),
-                          '按选金额、收件邮箱、账单、邮件交付逐步选图。当前实际付款前核对账户与等待安排。', phone='apple'),
+                          '一次给齐选金额、收件邮箱、账单、邮件交付图解。当前实际付款前核对账户与等待安排。', phone='apple'),
     'gift_alipay': card('支付宝渠道购买礼品卡', 'payment_preparation', '03-apple.md', pics('images/apple', '14.jpg'),
                         '客户选择该渠道后，按当前页面核对地区、金额及交付方式；已有礼品卡接兑换。', phone='apple'),
     'gift_redeem': card('兑换礼品卡到账户余额', 'payment_preparation', '03-apple.md', pics('images/apple', '15.jpg'),
@@ -103,20 +104,17 @@ def eligible(topic, state):
         return False
     if item['phone'] == 'android' and device.get('phone') != 'android':
         return False
-    if item['seller'] and account.get('purchase_channel') != item['seller']:
+    if item['seller'] and account.get('purchase_channel', 'chuhai91') != item['seller']:
         return False
     return True
 
 
 def alipay_instructions():
-    import re
-    chapter = (ROOT / 'references/03-apple.md').read_text(encoding='utf-8')
-    url = re.search(r'\[(https://render\.alipay\.com/[^\]]+)\]', chapter)[1]
     return ('**买礼品卡首推支付宝。iPhone 直接用备忘录跳转小程序：**\n'
             '1. 复制下面这条完整链接，打开「备忘录」，新建一条备忘录并粘贴。\n'
             '2. 点备忘录里的链接，出现打开支付宝的提示时，选择「打开」。\n'
             '3. 看到支付宝内的礼品卡购买页面后，核对美区、金额和商家，再继续购买。\n\n'
-            '[复制这条完整跳转链接](' + url + ')\n\n' + url + '\n\n'
+            '[复制这条完整跳转链接](' + ALIPAY_URL + ')\n\n' + ALIPAY_URL + '\n\n'
             '若点开后没有进入小程序，停在当前页面，告诉我页面提示或发截图，我按这个跳转入口继续帮您定位。')
 
 
@@ -129,8 +127,6 @@ def guide(topic, state, stage, step=None):
     if topic == 'gift_alipay':
         item['instruction'] = alipay_instructions()
     images = item['images']
-    if step is None and len(images) > 1 and topic not in ('google_materials', 'google_2fa'):
-        step = 1
     if step is not None:
         if step < 1 or step > len(images):
             raise ValueError('teaching_step_out_of_range')
@@ -152,15 +148,20 @@ def guide(topic, state, stage, step=None):
     pdf = ROOT / 'assets/reading' / pdf_name if pdf_name else None
     fallback = f'[打开对应图文 PDF](<{pdf.as_posix()}>)' if pdf and pdf.is_file() else ''
     message = item['instruction'] + ('\n\n' + '\n\n'.join(markup) if markup else '')
+    if topic == 'vps_bandwagon':
+        message += '\n\n' + fallback
+        registration = ROOT / 'assets/vps-purchase/bandwagon-registration.pdf'
+        if registration.is_file():
+            message += f'\n\n[搬瓦工注册中文图解 PDF](<{registration.as_posix()}>)'
     if missing:
         message += '\n\n图片暂未能读取。' + (fallback or '先根据当前页面逐步说明。')
     return {'status': 'teaching', 'stage': stage, 'topic': topic, 'title': item['title'],
-            'reference': item['reference'], 'customer_message': message, 'fallback_document': fallback,
+            'reference': item['reference'], 'instruction': item['instruction'], 'customer_message': message, 'fallback_document': fallback,
             'customer_images': available,
             'image_markdown': markup,
             'missing_images': missing, 'step': step, 'total_steps': len(item['images']),
             'progress_unchanged': True,
-            'display_instruction': POLICY + ' 将当前小步骤的 image_markdown 直接嵌入聊天；多步主题用 --step 选择当前页。'
+            'display_instruction': POLICY + ' 当前主题只用于定位讲解；阶段或分支首次展示时，仍按 next 返回的 customer_images 补齐所有尚未展示的适用图。首次展示将 image_markdown 全部嵌入聊天；--step 仅用于后续定位重讲，不限制首次整组展示。'
             '缺图或显示失败时给出可打开的原文件／对应 PDF，继续用当前页面拆细指导；原图示例不覆盖现场值。',
             'resume_instruction': '讲解结束后回到原阶段，只提交实际完成的观察；已有等待与付款安排继续沿用。'}
 
@@ -204,6 +205,7 @@ def attach(result, state):
                        'phone_network':'network_check', 'app':'claude_app' if eligible('claude_app',state) else 'android_phone',
                        'login':'google_login'}.get(stage)
     selected = data.get('teaching_topic')
+    gallery = stage_gallery(state, stage, result, selected)
     if (isinstance(selected, str) and selected in CARDS and stage in CARDS[selected]['stages'] and eligible(selected,state)
             and result.get('status') not in ('waiting', 'needs_support')
             and data.get('purchase_restricted') is not True
@@ -213,24 +215,88 @@ def attach(result, state):
                      and data.get('payment_ready') is not True)
             and not (stage == 'subscription' and data.get('order_confirmed') is True)):
         default = selected
+    if default and CARDS[default]['images'] and not any(lesson['topic'] == default for lesson in gallery):
+        default = None
     if default and eligible(default,state):
-        # A multi-page process starts with the relevant first page. Account material
-        # explanation is one three-page lesson; it does not initiate account login.
-        step = None if default == 'google_materials' or not CARDS[default]['images'] else 1
-        if default == selected and data.get('teaching_step') is not None:
-            step = data['teaching_step']
+        step = data.get('teaching_step') if default == selected else None
         result['default_teaching'] = guide(default,state,stage,step)
-        result['customer_images'] = result['default_teaching']['customer_images'].copy()
-        result['image_markdown'] = result['default_teaching']['image_markdown'].copy()
-        result['missing_images'] = result['default_teaching']['missing_images'].copy()
-        if not result.get('customer_message'):
+        if not result.get('customer_message') and not CARDS[default]['images']:
             result['customer_message'] = result['default_teaching']['customer_message']
-        elif result['default_teaching']['image_markdown']:
-            result['customer_message'] += ''.join('\n\n' + markup for markup in result['default_teaching']['image_markdown']
-                                                 if markup not in result['customer_message'])
-        if result['default_teaching']['missing_images'] and result['default_teaching']['fallback_document']:
-            result['customer_message'] += '\n\n图片暂未能读取，' + result['default_teaching']['fallback_document']
-    result['display_instruction'] = result.get('display_instruction','') + ' ' + POLICY + ' 已到后续小步时，先用 guide 对应页替换阶段起点参考图，本轮只展示当前操作的图。'
-    result['next_action'] += (' 按当前操作从 teaching_topics 选择对应图解并默认展示；default_teaching 是阶段起点参考，已有后续进度直接取对应小步。'
-                              '确认当前小步后可提交 teaching_topic 与 teaching_step 保存位置；操作推进时更新这两个字段。用户说不会时用 guide 重新取图，已有展示标记不抑制重讲；主题不明确时结合上下文，只补问缺少的一点。')
+    if gallery:
+        result['gallery_topics'] = [lesson['topic'] for lesson in gallery]
+        result['customer_message'] = result.get('customer_message', '') + '\n\n下面先给齐本阶段图解，按上面的当前任务开始，已完成的部分直接往下接。'
+        if result.get('status') == 'waiting':
+            result['customer_message'] += '当前仍按已确认的时间等待；以下购买与兑换图解先供您查看，到时间后再操作。'
+        result['customer_images'], result['image_markdown'], result['missing_images'] = [], [], []
+        for lesson in gallery:
+            new_images = [p for p in lesson['customer_images'] if p not in result['customer_images']]
+            result['customer_images'].extend(new_images)
+            result['missing_images'].extend(p for p in lesson['missing_images'] if p not in result['missing_images'])
+            markup = [f'![{lesson["title"]} · 图 {lesson["customer_images"].index(p)+1}](<{(ROOT / p).as_posix()}>)' for p in new_images]
+            result['image_markdown'].extend(markup)
+            message = result.get('customer_message', '')
+            # Existing account/payment messages already embed some original figures.
+            fresh = [m for p,m in zip(new_images,markup) if str(ROOT / p) not in message]
+            if fresh or lesson['missing_images']:
+                instruction = lesson['instruction']
+                message += '\n\n**' + lesson['title'] + '**\n' + instruction
+                message += ''.join('\n\n' + m for m in fresh)
+                if lesson['missing_images'] or lesson['topic'].startswith('vps_'):
+                    message += '\n\n' + lesson['fallback_document']
+                if lesson['topic'] == 'vps_bandwagon':
+                    registration = ROOT / 'assets/vps-purchase/bandwagon-registration.pdf'
+                    message += f'\n\n[搬瓦工注册中文图解 PDF](<{registration.as_posix()}>)'
+                result['customer_message'] = message.strip()
+    result['display_instruction'] = result.get('display_instruction','') + ' ' + POLICY
+    result['teaching_next_action'] = ('按当前操作从 teaching_topics 选择图解；首次阶段回复完整展示 customer_message 中整套图，标明当前起点。'
+                              '确认当前小步后可提交 teaching_topic 与 teaching_step 保存位置；这些字段用于定位，不缩减阶段图集。用户求助用 guide --step 重讲对应页。')
     return result
+
+
+def stage_gallery(state, stage, result, selected):
+    """One complete gallery for the current device, vendor and payment route."""
+    from workflow_definition import facts
+    data = facts(state, stage)
+    decision = result.get('purchase_decision', {})
+    vendor = decision.get('vendor') if data.get('vps_origin') == 'purchase' else None
+    if (not decision.get('can_purchase') and isinstance(selected,str)
+            and selected in ('vps_dmit','vps_bandwagon')):
+        vendor = selected.removeprefix('vps_')
+    topics = []
+    for topic,item in CARDS.items():
+        if stage not in item['stages'] or not eligible(topic,state) or not item['images']:
+            continue
+        support = result.get('status') == 'needs_support' or data.get('purchase_restricted') is True
+        if support != (topic == 'apple_support'):
+            continue
+        if topic in ('google_materials', 'google_2fa'):
+            account = facts(state, 'google')
+            purchasing = account.get('account_available') is False and account.get('purchase_channel') in ('chuhai91', 'gmailbuy')
+            if account.get('account_origin') != 'purchased' and not (stage == 'google' and purchasing):
+                continue
+        if topic in ('apple_register', 'apple_region', 'apple_store'):
+            if stage == 'phone_proxy' and data.get('client_available') is not False:
+                continue
+            if topic == 'apple_register' and selected != 'apple_register':
+                continue
+            if topic == 'apple_region' and selected != 'apple_region':
+                if data.get('region') == 'US' or not (data.get('region') or data.get('account_origin') == 'newly_registered'):
+                    continue
+            if topic == 'apple_store' and (not data.get('account_origin') or data.get('store_signed_in') is True):
+                continue
+        if topic.startswith('gift_') and (not data.get('account_origin') or data.get('payment_ready') is True):
+            continue
+        if topic.startswith('vps_') and topic != 'vps_' + (vendor or ''):
+            continue
+        if stage == 'vps' and data.get('vps_origin') == 'existing' and topic.startswith('vps_'):
+            continue
+        if stage == 'google' and item['seller'] and data.get('account_available') is not False:
+            continue
+        if topic == 'gift_official' and data.get('gift_channel') != 'apple_official':
+            continue
+        if topic == 'gift_alipay' and data.get('gift_channel') in ('apple_official','already_funded'):
+            continue
+        if topic in ('gift_official','gift_alipay','gift_redeem') and data.get('gift_channel') == 'already_funded':
+            continue
+        topics.append(guide(topic,state,stage))
+    return topics

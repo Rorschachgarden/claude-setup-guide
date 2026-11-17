@@ -16,7 +16,7 @@ from network_server import Failure
 from workflow_messages import customer_output
 from workflow_teaching import CARDS, eligible, guide as teaching_guide
 from update import workflow_output
-from workflow_definition import ACTIONS, DEVICE_GUIDANCE, INVALIDATES, OBJECT_FIELDS, catalog, facts, validation
+from workflow_definition import ACTIONS, DEVICE_GUIDANCE, INVALIDATES, OBJECT_FIELDS, APPLE_OPTIONAL, catalog, facts, validation
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -257,7 +257,12 @@ class Workflow:
         existing = facts(self.state, view['stage'])
         object_field = OBJECT_FIELDS.get(view['stage'])
         if object_field in data and object_field in existing and data[object_field] != existing[object_field]:
-            existing = {}
+            if view['stage'] == 'phone_proxy':
+                existing = {k: v for k, v in existing.items() if k not in APPLE_OPTIONAL}
+            elif view['stage'] == 'browser':
+                existing = {k: v for k, v in existing.items() if k == 'usage_explained'}
+            else:
+                existing = {}
         if data.get('wait_choice') == 'continue' and source['kind'] != 'user':
             raise WorkflowError('立即继续需记录客户明确选择，source.kind=user')
         if data.get('score_review') == 'continue' and source['kind'] != 'user':
@@ -277,7 +282,7 @@ class Workflow:
         if view['stage'] == 'vps':
             if data.get('access_ready') is False or 'purchase_checks' in data:
                 merged.setdefault('vps_origin', 'purchase')
-            if merged.get('access_ready') is True and not existing.get('access_ready'):
+            if merged.get('access_ready') is True:
                 if merged.get('vps_origin') not in ('existing', 'purchase'):
                     raise WorkflowError('先记录 vps_origin=existing（已有 VPS）或 purchase（本次购买）')
                 if merged['vps_origin'] == 'purchase':

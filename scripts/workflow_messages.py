@@ -99,6 +99,7 @@ def customer_output(result, state, now):
     if key == 'cleanup':
         messages.append('如果您的设备是 iPhone，且还装着此前使用的 Claude App，建议删除后重新下载，您可以自行安排。电脑按实际系统处理适用的登录残留。')
         result['next_action'] = ('按 references/04-recovery.md 核对实际使用范围，执行适用的平台清理或浏览器站点清理。'
+                                 '客户要求先讲解、稍后再操作时，保持清理阶段，讲解后等其决定。只有客户明确选择暂缓清理并继续后续流程时，才记录 outcome=deferred。'
                                  '用当前 ticket 提交实际 outcome 和 handled_scope，再按返回的当前阶段继续。'
                                  '首次交付接回设备搭配与阅读版说明 → Google 账号准备 → VPS；恢复交付复用已有结果，只补当前缺项。'
                                  '客户说“先配置电脑”表示操作顺序，后续仍须完成手机网络、手机登录和订阅。')
@@ -142,8 +143,9 @@ def customer_output(result, state, now):
         purchase = result.get('purchase_decision') or evaluate(data.get('purchase_checks'), now, alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'), captures={})
         result['purchase_decision'] = purchase
         maintained = purchase.get('source') == 'maintainer'
-        result['purchase_instruction'] = CURRENT_INSTRUCTION if maintained else POLICY
-        guidance = CURRENT_GUIDANCE if maintained else VPS_PURCHASE_GUIDANCE
+        current_check = purchase.get('source') == 'current_offer_check'
+        result['purchase_instruction'] = CURRENT_INSTRUCTION if maintained or current_check else POLICY
+        guidance = CURRENT_GUIDANCE if maintained else ('正在核对当前推荐套餐，按本次实际页面结果继续。' if current_check else VPS_PURCHASE_GUIDANCE)
         messages.extend([VPS_GUIDANCE, guidance] if not data.get('vps_origin') else [guidance])
         result['next_action'] = ('VPS 选型直接按默认洛杉矶机房与目标套餐推进，不询问用户主要在哪个国家或地区使用、所在地、城市或运营商。'
                                  'node_timezone 从所选节点机房城市取得，已有 VPS 读取实际节点资料；用户主动提出特殊需求时按其需求调整。'
@@ -155,7 +157,9 @@ def customer_output(result, state, now):
                                   '先 run --action vps_capture --input 页面输入.json 采集页面，观察填写 receipt_id 并逐字引用 evidence；'
                                   '可购买还需 billing_evidence 引用周期、本次金额和续费金额。用返回的 purchase_decision 决定查看哪家。can_purchase=true 才给付款指引。')
         if maintained:
-            result['next_action'] = CURRENT_INSTRUCTION + ' 记录 vps_origin=existing 或 purchase；购买后确认服务器开通和SSH访问，再提交 access_ready=true。'
+            result['next_action'] = '记录 vps_origin=existing 或 purchase；购买后确认服务器开通和SSH访问，再提交 access_ready=true。'
+        if current_check:
+            result['next_action'] = '按 purchase_decision 处理当前推荐套餐的复核结果；可购买时继续核对金额和开通资料，缺货、金额变化或尚未核实时反馈维护者。'
         if facts(state, 'vps').get('vps_origin') == 'purchase':
             for observation in purchase['checked']:
                 if observation['status'] == 'available':
