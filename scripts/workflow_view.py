@@ -40,7 +40,6 @@ def compact(result):
     result.pop('account_history', None)
     result.pop('previous_observation', None)
     result.pop('communication_instruction', None)
-    result.pop('task_scope_instruction', None)
     result.pop('teaching_instruction', None)
     result.pop('image_markdown', None)
     result['teaching_topics'] = [{k: topic[k] for k in ('id', 'title')} for topic in result.get('teaching_topics', [])]

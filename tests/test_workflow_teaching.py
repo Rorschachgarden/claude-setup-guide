@@ -62,6 +62,27 @@ class TeachingTests(unittest.TestCase):
         view=c.flow.submit(c.payload({'account_origin':'self_used'}))
         self.assertEqual(view['stage'],'vps')
 
+    def test_future_login_question_preserves_google_then_advances_to_vps(self):
+        from workflow_view import compact
+        c = self.case
+        c.reach('google')
+        before = deepcopy(c.flow.state)
+        current = c.flow.next()
+        lesson = c.flow.guide('google_login')
+        self.assertTrue(lesson['progress_unchanged'])
+        self.assertEqual(c.flow.state, before)
+        short = compact(c.flow.next())
+        self.assertEqual(short['stage'], 'google')
+        self.assertEqual(short['ticket'], current['ticket'])
+        self.assertEqual(short['task_scope_instruction'], current['task_scope_instruction'])
+        self.assertEqual(short['question_instruction'], current['question_instruction'])
+        self.assertIn('回应后明确接回控制层当前阶段', short['task_scope_instruction'])
+        ready = compact(c.flow.submit(c.payload({'account_available': True, 'account_origin': 'self_used'})))
+        self.assertEqual(ready['stage'], 'vps')
+        self.assertIn('access_ready', ready['missing'])
+        self.assertEqual(ready['task_scope_instruction'], short['task_scope_instruction'])
+        self.assertEqual(ready['question_instruction'], short['question_instruction'])
+
     def test_repeat_and_cross_stage_help_preserve_state_and_ticket(self):
         c=self.case;self.buy()
         c.flow.submit(c.payload({'materials_explained':True,'materials_images_shown':GOOGLE_IMAGES.copy()}))

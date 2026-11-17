@@ -1,10 +1,10 @@
 {
-  "version": "1.0.56",
-  "published_at": "2026-11-15",
+  "version": "1.0.57",
+  "published_at": "2026-11-17",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "VPS 选购只保留搬瓦工和 DMIT，当前默认仍为搬瓦工洛杉矶 USCA_9、2 GB、89.99 美元季付",
-    "同步选购说明与 PDF 图解，已完成的 VPS 购买进度继续复用"
+    "跨阶段提问先核对依据并接回当前操作，保持既定交付顺序",
+    "进度记录保留客户原话中的不确定性，明确完成后再推进"
   ]
 }

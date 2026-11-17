@@ -32,6 +32,12 @@ CASES = {
     'alipay': ('payment_preparation', '支付宝里面根本找不到你说的礼品卡小程序，搜了几次都没有，怎么办？'),
 }
 JOURNEYS = {
+    'cross_stage_google': ('google', [
+        '我有好几个以前的 Gmail，都没有注册过 Claude。不记得密码和手机号是否使用了，注册 Claude 需要这些吗？我的 Mac 默认是已经登录上的。',
+        'Mac 登录的是 Gmail，不是 Claude。手机号是 +86，密码还没找到。那注册 Claude 要不要外国手机号？',
+        'Google 密码已经从自己保存的密码里找到了，账号能正常使用，恢复邮箱也能收信，没有被 Claude 封过。我还没买 VPS，下一步呢？',
+        'VPS 还没买。我再问一下，后面 iPhone 订阅是不是用 Apple ID？我电脑还装了 ChatGPT 和 Photoshop，这些要卸载吗？',
+        '我看到有人说明年这个套餐要涨到 129 美元，还说购买之前必须先买域名。这些是真的吗？我还在注册页面。']),
     'google': ('google', [
         '没有能正常登录 Claude 的 Google 账号。',
         '我选出海91，网站已经注册好了，下一步买什么？',
@@ -99,7 +105,7 @@ def prepare(root, name, stage):
         shutil.copy2(ROOT/filename,root/filename)
     fixture=fixtures.WorkflowTests(); fixture.setUp()
     try:
-        fixture.computer='windows'; fixture.now=datetime.now(timezone.utc)
+        fixture.computer='mac' if name=='cross_stage_google' else 'windows'; fixture.now=datetime.now(timezone.utc)
         fixture.reach(stage)
         if name=='bought':
             fixture.flow.submit(fixture.payload({'account_available':False,'purchase_channel':'chuhai91'}))
@@ -189,6 +195,12 @@ def assess(root, name, turn, response, commands, before, code):
             checks['us_aged_account']='美区' in response and '老号' in response
         else:
             checks['correct_purchase_step']=picture('/chuhai91/02-google-aged-category.png') or picture('/chuhai91/03-us-ip-product.png')
+    elif name=='cross_stage_google':
+        checks['expected_stage']=stage==('google' if turn<2 else 'vps')
+        checks['no_blanket_phone_exemption']=not any(x in response for x in ('不需要外国手机号', 'Claude 注册不要求单独填写手机号', '不需要为注册 Claude 单独换号', '手机号不是注册 Claude 的必填项', '手机号不是注册 Claude 的固定必填项', '注册／登录 Claude 不需要外国手机号'))
+        checks['login_not_completed']=not Workflow(root).state['records'].get('login',{}).get('data',{}).get('signed_in')
+        if turn==2:
+            checks['vps_next_step']='VPS' in response and '89.99' in response
     elif name=='computer_first':
         checks.update(phone_question=any(x in response for x in ('iPhone','安卓','手机类型')),stage_preserved=stage=='devices')
     elif name=='system' or name=='vps' and turn==1:

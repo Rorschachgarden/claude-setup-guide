@@ -2,10 +2,10 @@
   "files": {
     ".gitattributes": "547f59603028195ff9f8a87d04c4651551e8bd0d68f075257dfd549cd846b25b",
     ".gitignore": "29d98e57738b3097cf43d3f351df9be6766d48a0b522393e1b5437a9587988f0",
-    "AGENTS.md": "a069ea997aafc3524665c0c80c4584c6f4417f13dacfe14c7d3f79c7fe0223ad",
-    "CHANGELOG.md": "fc6181be8ad856992bd0f1bee1a0a81ff4de2ef450ae2afcbfa6108a26f96222",
+    "AGENTS.md": "c3ef6da1a607b3dcdb530bc8c0e39f29632e4603dab6d273813793921999d825",
+    "CHANGELOG.md": "0ad154830397ee3483bf12c1302ed84dec5fcd1ea15806428b664c9b7d5d4d9f",
     "README.md": "7bc5546f2b130f2509f6e29e7bf378324ab54316c068c1f8e6b060b05592aa22",
-    "SKILL.md": "69efe65a80d90c6cdc55bc275f41b973cea6271b718efc573c647eb0fd798422",
+    "SKILL.md": "8dd8b656474105bb50a1901cc44fa74b0cbeb25bd190bb87b3eaee4b2c619de9",
     "agents/openai.yaml": "77f7b07e49ad3a01d1cd9f61e5ef30867346474bb53a4af6b77a84ad6cf22014",
     "assets/chuhai91/01-register.png": "ca8385e9fab02afa4bf593977fcf312afca98c6011bc02edb2161fa78b3e4055",
     "assets/chuhai91/02-google-aged-category.png": "91c4f5f9c44ab08b66ee7a9913e3256b39ce7e2200741b51844b684c9ce5a956",
@@ -111,7 +111,7 @@
     "references/14-scripted-execution.md": "33900cd593f5b0564f79d9736bdb5735319bd63bf18fdf2604c1f59e52a72690",
     "references/15-mac-cleanup.md": "fbecc3fe524aca7877122e068880a87b7dff25c7e44d434dec806fa447495b33",
     "references/16-windows-cleanup.md": "effe5f7a113500cee00e897db6f09554853c73483a8ca30d005b8d9727e8c8c9",
-    "references/17-workflow-controller.md": "7d3b1e564ffe14a26d217c40253b47c598238e65267b86ebc8f1e2e544056594",
+    "references/17-workflow-controller.md": "466e029323d7df68a84c1e8e46b430e5502903c76b28f30a6be31db7f5f1480a",
     "references/18-vps-stock.md": "9fb10a5c5c81f2ee8313157ef81d9d133b5ad112ef170eac1894809d65ef3eec",
     "scripts/cleanup.py": "cf91cee37f8307afaf2e8fa6c852377203bbdb815090b69d6919069b02edd7e3",
     "scripts/cleanup_windows.py": "960a28b6a9ca1c20c7fbe6f031209a3a1b9602924b2021e067cad6993cf7d186",
@@ -129,10 +129,10 @@
     "scripts/workflow.py": "1016982a594f9d6287981266a660a8677831cea14c8f02524e14355ece20b2cb",
     "scripts/workflow_definition.py": "b00d27425049885227821ebe020e367037526afc9aa3661c5096d2c6e7a74034",
     "scripts/workflow_guard.py": "045d1e68962fc74adb9a9a6b9ba1aeec98b1fed0de9b26ed9926f5b55314784e",
-    "scripts/workflow_messages.py": "a1cfd79b307edd09347569c6b6b0a91116fe9989f8446865347a5851e109a001",
+    "scripts/workflow_messages.py": "c11bd16d4ae862a4fa9c44439f22628b2b869988ab0179d757459bd400bf5c4e",
     "scripts/workflow_teaching.py": "b932dd8f52c6430b8428e2d48cbe528049910909e0d99f0aaa2b330552318741",
-    "scripts/workflow_view.py": "fc68b69f925e9dce10b62a284fbbe4dab138f012c1ac92c0239d0f65db959271",
-    "tests/model_replay.py": "6b4b339a368fe49be41f9b787874f79ee58b9bf4450492adf670b8c1e31f566a",
+    "scripts/workflow_view.py": "a68059fe9fc372a7ea5a3007b8ccbc7b726f7535cd4128ab139095e5b2c667df",
+    "tests/model_replay.py": "091354f85afff3ccd81933baf9f7143276da32d204b4a88076e4b5440eb7b5d5",
     "tests/panel_contract_smoke.py": "bb7059e35488f569ec67a1720280cfff3718de5eabb5595ca98fefe5ccbcfb96",
     "tests/test_capture_receipts.py": "f394510a800233b8611ec37a2a0f3e4acb569d5442d19e3248902692adfbcd88",
     "tests/test_customer_flow_audit.py": "a6c4b486b3e3b3525a93cdc66acab45c67aebbc1af82af7cd0a6038e7e6addb3",
@@ -148,8 +148,8 @@
     "tests/test_vps_purchase.py": "31fb3da1107b43d502b9c77b586e2bed7dd31f66b96145e74a627d7cea15cf45",
     "tests/test_windows_cleanup.py": "c169090fbe1a8b420ebd4414f1480461117b10d87114240146dcd2c2e3ba0507",
     "tests/test_workflow.py": "e86e36bc77d98eacc9dfd324c248634563bc4abbdf097b15396d2ca540771d44",
-    "tests/test_workflow_teaching.py": "bbf1e90c38e09ab81b90823b79f028579944d9ce3934391676f56a1684c181aa",
+    "tests/test_workflow_teaching.py": "5d251444d0ff3de6d3b6060850331dfacfde68ad54734fd5e31cfbce7c981c7e",
     "tests/test_workflow_updates.py": "70b4d98904e32f6de176874d8267f89d8f59ba4e6e6d3475641bfc206ca62b4f",
-    "version.json": "a399856daaa1e6e8ff6143e309dc0a10ff9a0185c10851bfd20c8b4b58d0817f"
+    "version.json": "05c3fdb1ccfb419fb2ebadb1eff7b6b7ea03706d734f1f9a1bb4b05c3bb31e3a"
   }
 }
