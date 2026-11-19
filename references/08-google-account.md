@@ -4,11 +4,11 @@
 
 ## 开始时先确认账号
 
-确认设备与当前进度后，尽早单独问：“您有没有能正常登录 Claude、没有被 Claude 封禁的 Google 账号？有的话直接沿用。”已有能正常登录 Claude 的账号就复用。尚未配置好网络时先确认和准备资料，实际登录留到手机网络验收后。
+确认设备与当前进度后，单独问：“您有一个现在能正常登录的 Google／Gmail 账号吗？”能登录的自有 Gmail 可以复用，包括从未使用过 Claude 的 Gmail。实际登录 Claude 留到手机网络验收后。
 
-账号复用以 Claude 的可用状态为准。Google／Gmail 能登录，但对应的 Claude 账号已被封禁时，记录 account_available=false，继续准备其他可用账号；若后来找回的账号也已被 Claude 封禁，同样按此处理。尚未用过 Claude 的 Google 账号先确认既有情况，实际登录仍留到手机网络验收后，不为回答这个问题提前登录。
+如果客户只谈到 Claude 账号，沿用开场原句确认 Google 账号。如果客户已明确说某个 Google 账号关联的 Claude 账号被封禁，先确认有没有另一个可用的 Google 账号。
 
-本流程只走“已有账号复用、没有账号购买”，不引导用户注册 Google 账号。`google` 阶段先单独询问账号；用户回答没有后，再同时展示两家渠道。已有可用账号记录 `account_origin=self_used`、`account_available=true`；购买账号收到资料时记录 `account_origin=purchased`、`account_available=true`，先完成下面的资料图解再继续。
+本流程只走“已有账号复用、没有账号购买”，不引导用户注册 Google 账号。客户明确没有可用的 Google 账号时，按客户原话提交 `google_account_status=unavailable`，再同时展示两家渠道。已有可用账号记录 `account_origin=self_used`、`google_account_status=available`；购买账号收到资料时记录 `account_origin=purchased`、`google_account_status=available`，先完成下面的资料图解再继续。
 
 没有可用账号时，先明确告诉客户：
 
@@ -63,7 +63,7 @@ Codex 在客户选定 GmailBuy 时直接展示这张图和入口。客户找不�
 
 ## 对话里直接给出 2FA 取码链接
 
-客户说“买好了，账号资料也收到了”时，提交 `account_origin=purchased` 与 `account_available=true`，控制层会保留在 Google 阶段并返回资料说明和 `customer_images`。将图片转为当前项目的绝对路径嵌入聊天，按下面原图解释资料，同时在本条回复直接写出：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。配一句大白话：“2FA 密钥就是生成登录验证码用的那串字母和数字；手机网络配好、登录时要求验证码，再用这个网站取码。”实际展示三张原图后由 Codex 提交 `materials_explained=true` 与 `materials_images_shown`（三张已展示图片的项目相对路径），随后按现有流程继续，无需用户额外确认。先前没有账号、后来找回自己的可用账号时，明确记录 `account_origin=self_used`，直接复用。
+客户说“买好了，账号资料也收到了”时，提交 `account_origin=purchased` 与 `google_account_status=available`，控制层会保留在 Google 阶段并返回资料说明和 `customer_images`。将图片转为当前项目的绝对路径嵌入聊天，按下面原图解释资料，同时在本条回复直接写出：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。配一句大白话：“2FA 密钥就是生成登录验证码用的那串字母和数字；手机网络配好、登录时要求验证码，再用这个网站取码。”实际展示三张原图后由 Codex 提交 `materials_explained=true` 与 `materials_images_shown`（三张已展示图片的项目相对路径），随后按现有流程继续，无需用户额外确认。先前没有账号、后来找回自己的可用账号时，明确记录 `account_origin=self_used`，直接复用。
 
 登录中出现身份验证器验证码时，再次直接展示这个可点击链接，并展示原取码、回填图解。链接、当前操作和对应图片一起给到；PDF 是配套阅读材料，对话本身要能让用户点开并照着做。
 

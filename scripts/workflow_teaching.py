@@ -201,9 +201,9 @@ def attach(result, state):
                 and data.get('gift_channel') in (None, 'alipay') and data.get('gift_entry') != 'opened'
                 and data.get('payment_ready') is not True):
             default = 'gift_alipay'
-        elif stage == 'google' and data.get('account_origin') == 'purchased' and data.get('account_available') is True:
+        elif stage == 'google' and data.get('account_origin') == 'purchased' and data.get('google_account_status') == 'available':
             default = 'google_materials'
-        elif stage == 'google' and data.get('account_available') is False:
+        elif stage == 'google' and data.get('google_account_status') == 'unavailable':
             default = 'gmailbuy' if data.get('purchase_channel') == 'gmailbuy' else 'chuhai_purchase'
         elif stage == 'vps':
             default = next((topic for topic in gallery_topics if topic in ('vps_bandwagon', 'vps_dmit')), 'network_basics')
@@ -295,7 +295,7 @@ def stage_gallery(state, stage, result, selected):
             continue
         if topic in ('google_materials', 'google_2fa'):
             account = facts(state, 'google')
-            purchasing = account.get('account_available') is False and account.get('purchase_channel') in ('chuhai91', 'gmailbuy')
+            purchasing = account.get('google_account_status') == 'unavailable' and account.get('purchase_channel') in ('chuhai91', 'gmailbuy')
             if account.get('account_origin') != 'purchased' and not (stage == 'google' and purchasing):
                 continue
         if topic in ('apple_register', 'apple_region', 'apple_store'):
@@ -314,7 +314,7 @@ def stage_gallery(state, stage, result, selected):
             continue
         if stage == 'vps' and data.get('vps_origin') == 'existing' and topic.startswith('vps_'):
             continue
-        if stage == 'google' and item['seller'] and (data.get('account_available') is not False or topic in CHUHAI_PAGE_TOPICS):
+        if stage == 'google' and item['seller'] and (data.get('google_account_status') != 'unavailable' or topic in CHUHAI_PAGE_TOPICS):
             continue
         if topic == 'gift_official' and data.get('gift_channel') != 'apple_official':
             continue

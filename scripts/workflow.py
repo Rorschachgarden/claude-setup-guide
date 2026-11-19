@@ -158,8 +158,7 @@ class Workflow:
         current = None
         progress = []
         for stage in catalog(self.state):
-            record = self.state['records'].get(stage['id'])
-            checked = self.checked(stage, record['data'] if record else {})
+            checked = self.checked(stage, facts(self.state, stage['id']))
             status = ('waiting' if checked.get('waiting_until') else 'complete') if checked['valid'] else 'pending'
             if current is not None and status == 'complete':
                 status = 'retained'
@@ -289,16 +288,19 @@ class Workflow:
                     if not self.purchase_decision(merged)['can_purchase']:
                         raise WorkflowError('先核对目标套餐实际订购页，取得可购买结果后再记录开通')
         if view['stage'] == 'google':
+            status = data.get('google_account_status')
+            if status == 'unavailable' and source['kind'] != 'user':
+                raise WorkflowError('购买分支须由客户明确确认没有可用的 Google／Gmail 账号，source.kind=user')
             # A missing account becoming available follows the purchase route;
             # an explicitly recovered personal account still takes the reuse route.
-            if data.get('account_available') is True and 'account_origin' not in data:
-                if existing.get('account_available') is False or existing.get('purchase_channel'):
+            if status == 'available' and 'account_origin' not in data:
+                if existing.get('google_account_status') == 'unavailable' or existing.get('purchase_channel'):
                     merged['account_origin'] = 'purchased'
-            if data.get('account_available') is True and not merged.get('account_origin'):
+            if status == 'available' and not merged.get('account_origin'):
                 merged['account_origin'] = 'unknown'
             if merged.get('account_origin') == 'purchased' and existing.get('materials_explained') is not True:
                 merged.setdefault('materials_images_shown', [])
-            if data.get('account_available') is False:
+            if status == 'unavailable':
                 merged.pop('materials_explained', None)
                 merged.pop('materials_images_shown', None)
             if merged.get('account_origin') == 'self_used':

@@ -67,6 +67,13 @@ JOURNEYS = {
         '买好了，账号资料也收到了，看不懂。',
         '刚才那个验证码还是不会弄，图没显示，你再教我一下。',
         '图都看到了，我现在知道账号和验证码怎么用了。还没实际登录，下一步呢？']),
+    'google_reuse': ('google', [
+        '设备和教程都准备好了，继续按流程，你现在要问我什么？',
+        '我没有 Claude 账号，也没有登录过。',
+        '有，我自己的 Gmail 能正常登录，从来没用过 Claude。']),
+    'google_other_account': ('google', [
+        '我的 Gmail 能登录，但是这个号以前用 Claude 被封过了。',
+        '我还有一个自己的 Gmail 可以正常登录，这个号从来没用过 Claude。']),
     'gift': ('payment_preparation', [
         '我要买礼品卡，怎么购买？',
         '从备忘录点开了，现在已经在支付宝里面看到礼品卡页面了。',
@@ -157,7 +164,7 @@ def prepare(root, name, stage):
             data['scores']['netcoffee']={'value':None,'result':'检测网站超时，另外两站正常'}
             fixture.flow.submit(fixture.payload(data))
         if name=='bought':
-            fixture.flow.submit(fixture.payload({'account_available':False,'purchase_channel':'chuhai91'}))
+            fixture.flow.submit(fixture.payload({'google_account_status':'unavailable','purchase_channel':'chuhai91'}))
         if stage=='payment_preparation':
             data=fixture.data(stage); data['payment_ready']=False
             if name=='alipay': data['gift_channel']='alipay'
@@ -261,6 +268,19 @@ def assess(root, name, turn, response, commands, before, code, transcript=()):
         if turn==2:
             checks['correct_purchase_step']=picture('/chuhai91/02-google-aged-category.png') or picture('/chuhai91/03-us-ip-product.png')
             checks['direct_category_link']='https://chuhai91.cc/categories/premium-aged-google-accounts' in response
+    elif name in ('google_reuse', 'google_other_account'):
+        finished = turn == len(JOURNEYS[name][1]) - 1
+        records = Workflow(root).state['records']
+        facts = records.get('google', {}).get('data', {})
+        checks['expected_stage'] = stage == ('vps' if finished else 'google')
+        checks['no_premature_purchase'] = 'https://chuhai91.cc/' not in response and 'https://gmailbuy.com/' not in response
+        if finished:
+            checks['correct_reuse'] = facts.get('account_origin') == 'self_used' and facts.get('google_account_status') == 'available'
+            checks['vps_handoff'] = 'VPS' in response
+        else:
+            checks['awaiting_google_confirmation'] = 'google_account_status' not in facts
+            checks['asks_about_google'] = ('Google' in response or 'Gmail' in response) and ('？' in response or '?' in response)
+            checks['no_phone_requirement'] = '手机号' not in response and '短信' not in response
     elif name=='cross_stage_google':
         checks['expected_stage']=stage==('google' if turn<2 else 'vps')
         checks['no_blanket_phone_exemption']=not any(x in response for x in ('不需要外国手机号', 'Claude 注册不要求单独填写手机号', '不需要为注册 Claude 单独换号', '手机号不是注册 Claude 的必填项', '手机号不是注册 Claude 的固定必填项', '注册／登录 Claude 不需要外国手机号'))

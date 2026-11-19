@@ -36,10 +36,10 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('iPhone、iPad 还是安卓手机', self.flow.next()['customer_message'])
         self.flow.submit(self.payload({'phone': 'iphone'}))
         self.assertEqual(self.flow.next()['stage'], 'google')
-        self.assertIn('您有没有能正常登录 Claude、没有被 Claude 封禁的 Google 账号', self.flow.next()['customer_message'])
-        self.flow.submit(self.payload({'account_available': False}))
+        self.assertIn('您有一个现在能正常登录的 Google／Gmail 账号吗？', self.flow.next()['customer_message'])
+        self.flow.submit(self.payload({'google_account_status': 'unavailable'}))
         self.assertEqual(self.flow.next()['stage'], 'google')
-        self.flow.submit(self.payload({'account_available': True}))
+        self.flow.submit(self.payload({'google_account_status': 'available'}))
         if self.flow.next()['stage'] == 'google':
             self.assertIn('materials_explained', self.flow.next()['missing'])
             self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
@@ -91,8 +91,8 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
 
     def test_purchased_materials_survive_submit_restart_and_duplicate(self):
         self.reach('google')
-        self.flow.submit(self.payload({'account_available': False}))
-        bought = self.payload({'account_available': True})
+        self.flow.submit(self.payload({'google_account_status': 'unavailable'}))
+        bought = self.payload({'google_account_status': 'available'})
         view = self.flow.submit(bought)
         self.assertEqual(view['stage'], 'google')
         self.assertEqual(view['observed']['account_origin'], 'purchased')
@@ -110,19 +110,19 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.phone = 'android'
         self.reach('google')
         self.assertIn('account_origin', self.flow.next()['optional_fields'])
-        self.flow.submit(self.payload({'account_available': False, 'purchase_channel': 'gmailbuy'}))
-        view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'purchased'}))
+        self.flow.submit(self.payload({'google_account_status': 'unavailable', 'purchase_channel': 'gmailbuy'}))
+        view = self.flow.submit(self.payload({'google_account_status': 'available', 'account_origin': 'purchased'}))
         self.assertEqual(view['stage'], 'google')
         self.assertIn('https://2fa.run/', view['customer_message'])
         self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
         self.flow.invalidate('google', 'Recovered own account for Android')
-        view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'self_used'}))
+        view = self.flow.submit(self.payload({'google_account_status': 'available', 'account_origin': 'self_used'}))
         self.assertEqual(view['stage'], 'vps')
 
     def test_direct_purchased_account_receives_materials_before_vps(self):
         self.reach('google')
-        view = self.flow.submit(self.payload({'account_origin': 'purchased', 'account_available': True}))
+        view = self.flow.submit(self.payload({'account_origin': 'purchased', 'google_account_status': 'available'}))
         self.assertEqual(view['stage'], 'google')
         self.assertIn('https://2fa.run/', view['customer_message'])
         self.assertIn('customer_images', view)
@@ -131,14 +131,14 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
 
     def test_recovered_personal_account_skips_purchase_materials(self):
         self.reach('google')
-        self.flow.submit(self.payload({'account_available': False, 'purchase_channel': 'chuhai91'}))
-        view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'self_used'}))
+        self.flow.submit(self.payload({'google_account_status': 'unavailable', 'purchase_channel': 'chuhai91'}))
+        view = self.flow.submit(self.payload({'google_account_status': 'available', 'account_origin': 'self_used'}))
         self.assertEqual(view['stage'], 'vps')
         self.assertNotIn('purchase_channel', self.flow.state['records']['google']['data'])
 
     def test_seller_choice_survives_resume_and_can_change(self):
         self.reach('google')
-        self.flow.submit(self.payload({'account_available': False, 'purchase_channel': 'gmailbuy'}))
+        self.flow.submit(self.payload({'google_account_status': 'unavailable', 'purchase_channel': 'gmailbuy'}))
         self.flow = Workflow(self.root, lambda: self.now)
         view = self.flow.next()
         self.assertIn('[GmailBuy](https://gmailbuy.com/)', view['customer_message'])
@@ -173,7 +173,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                                 case.flow.submit(case.payload({'outcome': outcome, 'handled_scope': 'Isolated actual scope'}))
                             self.assertEqual(case.flow.next()['stage'], 'devices')
                             case.reach('google')
-                            self.assertIn('您有没有', case.flow.next()['customer_message'])
+                            self.assertIn('您有一个现在能正常登录的 Google／Gmail 账号吗？', case.flow.next()['customer_message'])
                             case.reach('browser')
                             case.advance()
                             for expected in ('phone_proxy', 'timezone', 'phone_network'):
@@ -362,14 +362,13 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
     def test_google_preparation_shows_reuse_purchase_and_login_timing(self):
         self.reach('google')
         view = self.flow.next()
-        self.assertIn('能正常登录 Claude、没有被 Claude 封禁', view['customer_message'])
-        self.assertIn('Google／Gmail 能登录，但对应的 Claude 账号已被封禁', view['next_action'])
-        self.assertIn('记录 account_available=false', view['next_action'])
-        self.assertIn('不为回答这个问题提前登录', view['next_action'])
-        self.assertIn('直接沿用', view['customer_message'])
+        self.assertIn('您有一个现在能正常登录的 Google／Gmail 账号吗？', view['customer_message'])
+        self.assertNotIn('被 Claude 封禁', view['customer_message'])
+        self.assertIn('只谈到 Claude 账号', view['next_action'])
+        self.assertIn('手机网络配置完成后，再使用 Google 账号登录 Claude', view['next_action'])
         for url in ('https://chuhai91.cc', 'https://gmailbuy.com/'):
             self.assertNotIn(url, view['customer_message'])
-        view = self.flow.submit(self.payload({'account_available': False}))
+        view = self.flow.submit(self.payload({'google_account_status': 'unavailable'}))
         for url in ('https://chuhai91.cc/', 'https://gmailbuy.com/'):
             self.assertIn(url, self.flow.next()['customer_message'])
         self.assertIn('手机网络配置完成后', view['customer_message'])
@@ -378,7 +377,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
 
     def test_google_missing_account_keeps_purchase_route_on_resume(self):
         self.reach('google')
-        self.flow.submit(self.payload({'account_available': False}))
+        self.flow.submit(self.payload({'google_account_status': 'unavailable'}))
         view = Workflow(self.root).next()
         self.assertEqual(view['stage'], 'google')
         self.assertIn('购买', view['customer_message'])
@@ -400,16 +399,48 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('先明确推荐', view['next_action'])
         self.assertIn('按实际页面定位老号分类并核对美区', view['next_action'])
         self.assertIn('避免叠加假设性风险', view['communication_instruction'])
-        self.assertNotIn('您有没有', view['customer_message'])
-        self.flow.submit(self.payload({'account_available': True}))
+        self.assertNotIn('您有一个现在能正常登录的 Google／Gmail 账号吗？', view['customer_message'])
+        self.flow.submit(self.payload({'google_account_status': 'available'}))
         if self.flow.next()['stage'] == 'google':
             self.assertIn('materials_explained', self.flow.next()['missing'])
             self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
 
+    def test_google_purchase_requires_a_google_specific_customer_observation(self):
+        self.reach('google')
+        payload = self.payload({'account_available': False})
+        payload['source'] = {'kind': 'user', 'reference': '我没有 Claude 账号。'}
+        with self.assertRaisesRegex(WorkflowError, 'unknown_observation_fields'):
+            self.flow.submit(payload)
+        payload = self.payload({'google_account_status': 'unavailable'})
+        payload['source'] = {'kind': 'tool', 'reference': '未见 Claude 登录状态'}
+        with self.assertRaisesRegex(WorkflowError, 'source.kind=user'):
+            self.flow.submit(payload)
+        view = self.flow.next()
+        self.assertEqual(view['stage'], 'google')
+        self.assertEqual(view['observed'], {})
+        self.assertNotIn('https://chuhai91.cc/', view['customer_message'])
+
+    def test_previous_google_status_resumes_saved_reuse_and_purchase_routes(self):
+        self.reach('google')
+        records = self.flow.state['records']
+        records['google'] = {'data': {'account_available': True, 'account_origin': 'self_used'}, 'observations': []}
+        self.flow.save()
+        self.flow = Workflow(self.root, lambda: self.now)
+        self.assertEqual(self.flow.next()['stage'], 'vps')
+        self.flow.state['records']['google']['data'] = {'account_available': False, 'purchase_channel': 'gmailbuy'}
+        self.flow.save()
+        self.flow = Workflow(self.root, lambda: self.now)
+        view = self.flow.next()
+        self.assertEqual(view['stage'], 'google')
+        self.assertEqual(view['observed']['purchase_channel'], 'gmailbuy')
+        self.assertIn('沿用您选择的', view['customer_message'])
+        view = self.flow.submit(self.payload({'google_account_status': 'available', 'account_origin': 'self_used'}))
+        self.assertEqual(view['stage'], 'vps')
+
     def test_existing_google_account_advances_without_purchase_requirement(self):
         self.reach('google')
-        self.flow.submit(self.payload({'account_available': True, 'account_origin': 'self_used'}))
+        self.flow.submit(self.payload({'google_account_status': 'available', 'account_origin': 'self_used'}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
         self.reach('login')
         self.assertTrue(self.flow.next()['next_action'].startswith('使用 Google 账号登录 Claude'))

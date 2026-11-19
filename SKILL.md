@@ -101,8 +101,8 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 PDF 位于 `assets/reading/`，给客户阅读；AI 按 Markdown 和控制层执行。开场说明与保存选择按阅读版章节完成，已有选择复用。找 PDF 内容时实际核对篇目和页码。进度和凭据只保存在 `.local/`，不提交到仓库。
 
-账号复用以 Claude 的可用状态为准。Google／Gmail 能登录，但对应的 Claude 账号已被封禁时，记录 account_available=false，继续准备其他可用账号；若后来找回的账号也已被 Claude 封禁，同样按此处理。尚未用过 Claude 的 Google 账号先确认既有情况，实际登录仍留到手机网络验收后，不为回答这个问题提前登录。
+Google 账号准备先原样展示控制层的提问「您有一个现在能正常登录的 Google／Gmail 账号吗？」。从未使用 Claude 的自有 Gmail 也可以复用。客户只谈 Claude 账号或仍不确定 Google 能否登录时，回到这句确认。客户已明确说这个号关联的 Claude 账号被封禁时，先确认是否有另一个可用 Google 账号。实际登录 Claude 留到手机网络验收后。
 
-客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 account_available=true，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。客户明确没有可用 Google 账号时，当轮记录 account_available=false，直接建议购买美区老号，同时展示两家入口及首选出海91的注册、分类和选号三张原图。注册的是出海91购物网站账号。客户索要出海91购买步骤或没看到图时，用 guide --topic chuhai_purchase 在同条回复重发三张原图和入口链接。
+客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 google_account_status=available，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。客户明确没有可用 Google 账号时，当轮按客户原话记录 google_account_status=unavailable，直接建议购买美区老号，同时展示两家入口及首选出海91的注册、分类和选号三张原图。注册的是出海91购物网站账号。客户索要出海91购买步骤或没看到图时，用 guide --topic chuhai_purchase 在同条回复重发三张原图和入口链接。
 
 **默认出图：**首次进入阶段，在聊天中按顺序展示该阶段适用的全部原图，配中文说明和当前起点。商家或渠道确定后立即给齐该分支整套图；设备、商家和渠道按实际选择匹配。图片全部提前展示，实际操作与验收仍按原阶段推进。用户说不会、找不到、没看懂或图片未显示时，立即重讲对应图。`guide --topic <主题ID>` 默认返回整组，`--step <图片序号>` 用于后续定位重讲；教学位置不缩减首次阶段图集。完整用法见 references/17-workflow-controller.md 的「默认出图与重复求助」。

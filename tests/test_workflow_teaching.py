@@ -25,7 +25,7 @@ class TeachingTests(unittest.TestCase):
     def buy(self):
         c = self.case
         c.reach('google')
-        return c.flow.submit(c.payload({'account_available': True, 'account_origin': 'purchased'}))
+        return c.flow.submit(c.payload({'google_account_status': 'available', 'account_origin': 'purchased'}))
 
     def test_purchase_renders_all_three_original_pages_in_message(self):
         view = self.buy()
@@ -48,13 +48,13 @@ class TeachingTests(unittest.TestCase):
 
     def test_buy_and_explained_in_same_submission_still_needs_image_receipt(self):
         c=self.case;c.reach('google')
-        view=c.flow.submit(c.payload({'account_available':True,'account_origin':'purchased','materials_explained':True}))
+        view=c.flow.submit(c.payload({'google_account_status':'available','account_origin':'purchased','materials_explained':True}))
         self.assertEqual(view['stage'],'google')
         self.assertIn('materials_images_shown',view['missing'])
 
     def test_unknown_origin_is_clarified_and_known_personal_account_reused(self):
         c=self.case;c.reach('google')
-        view=c.flow.submit(c.payload({'account_available':True}))
+        view=c.flow.submit(c.payload({'google_account_status':'available'}))
         self.assertEqual(view['stage'],'google')
         self.assertIn('account_origin',view['missing'])
         self.assertIn('还是刚购买',view['customer_message'])
@@ -77,7 +77,7 @@ class TeachingTests(unittest.TestCase):
         self.assertEqual(short['task_scope_instruction'], current['task_scope_instruction'])
         self.assertEqual(short['question_instruction'], current['question_instruction'])
         self.assertIn('回应后明确接回控制层当前阶段', short['task_scope_instruction'])
-        ready = compact(c.flow.submit(c.payload({'account_available': True, 'account_origin': 'self_used'})))
+        ready = compact(c.flow.submit(c.payload({'google_account_status': 'available', 'account_origin': 'self_used'})))
         self.assertEqual(ready['stage'], 'vps')
         self.assertIn('access_ready', ready['missing'])
         self.assertEqual(ready['task_scope_instruction'], short['task_scope_instruction'])
@@ -119,7 +119,7 @@ class TeachingTests(unittest.TestCase):
 
     def test_seller_and_platform_images_do_not_cross_routes(self):
         c=self.case;c.reach('google')
-        c.flow.submit(c.payload({'account_available':False,'purchase_channel':'gmailbuy'}))
+        c.flow.submit(c.payload({'google_account_status':'unavailable','purchase_channel':'gmailbuy'}))
         self.assertNotIn('chuhai_register',[t['id'] for t in c.flow.next()['teaching_topics']])
         before=c.flow.path.read_bytes()
         preview=c.flow.guide('chuhai_purchase')
@@ -223,7 +223,7 @@ class TeachingTests(unittest.TestCase):
 
     def test_no_google_account_shows_default_seller_gallery_before_choice(self):
         c=self.case;c.reach('google')
-        view=c.flow.submit(c.payload({'account_available':False}))
+        view=c.flow.submit(c.payload({'google_account_status':'unavailable'}))
         self.assertTrue(all(p in view['customer_images'] for p in ('assets/chuhai91/01-register.png',
                            'assets/chuhai91/02-google-aged-category.png','assets/chuhai91/03-us-ip-product.png')))
         self.assertNotIn('purchase_channel',view['observed'])
@@ -238,7 +238,7 @@ class TeachingTests(unittest.TestCase):
 
     def test_chosen_seller_starts_with_all_purchase_and_material_images(self):
         c=self.case;c.reach('google')
-        view=c.flow.submit(c.payload({'account_available':False,'purchase_channel':'chuhai91'}))
+        view=c.flow.submit(c.payload({'google_account_status':'unavailable','purchase_channel':'chuhai91'}))
         expected=['assets/chuhai91/01-register.png','assets/chuhai91/02-google-aged-category.png',
                   'assets/chuhai91/03-us-ip-product.png'] + GOOGLE_IMAGES
         self.assertEqual(view['customer_images'],expected)
@@ -298,7 +298,7 @@ class TeachingTests(unittest.TestCase):
     def test_legacy_completed_materials_are_not_reopened_for_new_receipt(self):
         c=self.case;c.reach('google')
         c.flow.state['records']['google']={'data':{'account_origin':'purchased',
-                'account_available':True,'materials_explained':True},'observations':[]}
+                'google_account_status':'available','materials_explained':True},'observations':[]}
         c.flow.save()
         self.assertEqual(c.flow.next()['stage'],'vps')
         self.assertEqual(c.flow.guide('google_materials')['customer_images'],GOOGLE_IMAGES)

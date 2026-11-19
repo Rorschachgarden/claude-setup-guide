@@ -24,7 +24,7 @@ class AdversarialFlowTests(unittest.TestCase):
     def test_google_questions_and_personal_login_do_not_show_delivery_materials(self):
         self.reach('google')
         self.assertNotIn('customer_images', self.flow.next())
-        result = self.flow.submit(self.payload({'account_available': True}))
+        result = self.flow.submit(self.payload({'google_account_status': 'available'}))
         self.assertNotIn('customer_images', result)
         self.flow.submit(self.payload({'account_origin': 'self_used'}))
         self.reach('login')
@@ -34,10 +34,10 @@ class AdversarialFlowTests(unittest.TestCase):
 
     def test_selected_purchase_channel_keeps_complete_preview(self):
         self.reach('google')
-        result = self.flow.submit(self.payload({'account_available': False, 'purchase_channel': 'chuhai91'}))
+        result = self.flow.submit(self.payload({'google_account_status': 'unavailable', 'purchase_channel': 'chuhai91'}))
         self.assertEqual(len(result['customer_images']), 6)
         self.assertTrue(all(p in result['customer_images'] for p in GOOGLE_IMAGES))
-        result = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'purchased'}))
+        result = self.flow.submit(self.payload({'google_account_status': 'available', 'account_origin': 'purchased'}))
         self.assertEqual(result['stage'], 'google')
         self.assertEqual(result['customer_images'], GOOGLE_IMAGES)
 

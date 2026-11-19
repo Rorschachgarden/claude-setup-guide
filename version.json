@@ -1,11 +1,10 @@
 {
-  "version": "1.0.59",
+  "version": "1.0.60",
   "published_at": "2026-11-19",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "无可用 Google 账号时直接推荐购买并给齐出海91图解，补充 GmailBuy 选购图",
-    "搬瓦工购买直接取整组图，重发图时给可点击原图和 PDF，支持只读比较商家图解",
-    "补充小火箭扫码、DNS 保存与本机备份步骤图"
+    "账号准备只问 Google／Gmail 能否登录，明确确认缺号后进入购买分支",
+    "Google 账号状态与出海91选购、账号资料和 2FA 图解联动，兼容已保存的进度"
   ]
 }

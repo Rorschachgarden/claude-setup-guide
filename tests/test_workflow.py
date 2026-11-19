@@ -76,9 +76,12 @@ class WorkflowTests(unittest.TestCase):
 
     def payload(self, data=None):
         view = self.flow.next()
+        data = data if data is not None else self.data(view['stage'])
+        source = {'kind': 'tool', 'reference': 'isolated device page observation'}
+        if data.get('google_account_status') == 'unavailable':
+            source = {'kind': 'user', 'reference': '我没有能正常登录的 Google 账号。'}
         return {'stage': view['stage'], 'ticket': view['ticket'],
-                'source': {'kind': 'tool', 'reference': 'isolated device page observation'},
-                'data': data if data is not None else self.data(view['stage'])}
+                'source': source, 'data': data}
 
     def advance(self):
         if self.flow.next()['stage'] == 'computer_network':

@@ -18,7 +18,8 @@ STAGES = [
      {'outcome': ('cleaned', 'deferred', 'not_applicable'), 'handled_scope': 'text'}),
     ('devices', '记录设备搭配与准备说明', '13-reader-guide.md',
      {'computer': ('mac', 'windows'), 'phone': ('iphone', 'ipad', 'android'), 'setup_explained': True, 'pdf_explained': True}),
-    ('google', '准备 Google 账号：已有复用，没有则购买', '08-google-account.md', {'account_available': True}),
+    ('google', '准备 Google 账号：已有复用，没有则购买', '08-google-account.md',
+     {'google_account_status': ('available',)}),
     ('vps', '读取或准备 VPS 与 SSH 访问', '01-network.md',
      {'access_ready': True, 'node_label': 'text', 'node_timezone': 'text'}),
     ('server', '配置并读回服务端节点', '01-network.md',
@@ -134,7 +135,13 @@ def apple_wait(data, now):
 
 
 def facts(state, stage):
-    return state.get('records', {}).get(stage, {}).get('data', {})
+    data = state.get('records', {}).get(stage, {}).get('data', {})
+    if stage == 'google' and 'account_available' in data:
+        data = dict(data)
+        available = data.pop('account_available')
+        if type(available) is bool:
+            data.setdefault('google_account_status', 'available' if available else 'unavailable')
+    return data
 
 
 def catalog(state):
