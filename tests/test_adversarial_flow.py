@@ -43,12 +43,13 @@ class AdversarialFlowTests(unittest.TestCase):
 
     def test_phone_gallery_and_explicit_support_branch(self):
         self.reach('phone_proxy')
-        expected = ['assets/images/network/14.jpg', 'assets/images/browser-iphone/10.jpg']
+        setup = ['assets/images/network/14.jpg', 'assets/images/browser-iphone/10.jpg']
+        expected = [setup[0], 'assets/step-guides/phone-qr-import.png', setup[1]]
         for update in ({}, {'client_available': True}):
             result = self.flow.submit(self.payload(update)) if update else self.flow.next()
             self.assertEqual(result['customer_images'], expected)
         result = self.flow.submit(self.payload({'client_available': False, 'account_origin': 'purchased'}))
-        self.assertEqual(result['customer_images'], expected + ['assets/images/apple/09.jpg'])
+        self.assertEqual(result['customer_images'], setup + ['assets/images/apple/09.jpg'])
         result = self.flow.submit(self.payload({'purchase_restricted': True}))
         self.assertEqual(result['customer_images'], ['assets/images/apple/18.jpg', 'assets/images/apple/19.jpg'])
         result = self.flow.submit(self.payload({'purchase_restricted': False}))
@@ -56,6 +57,15 @@ class AdversarialFlowTests(unittest.TestCase):
         result = self.flow.submit(self.payload({'teaching_topic':'apple_support'}))
         self.assertNotEqual(result.get('default_teaching', {}).get('topic'), 'apple_support')
         self.assertNotIn('assets/images/apple/18.jpg', result['customer_images'])
+
+    def test_phone_specific_help_returns_diagram_and_openable_link(self):
+        self.reach('phone_proxy')
+        for topic, filename in (('phone_dns', 'phone-dns-save.png'), ('phone_backup', 'phone-config-backup.png')):
+            with self.subTest(topic=topic):
+                result = self.flow.guide(topic)
+                self.assertEqual(result['customer_images'], [f'assets/step-guides/{filename}'])
+                self.assertIn(result['image_links'][0], result['customer_message'])
+                self.assertEqual(self.flow.next()['stage'], 'phone_proxy')
 
     def test_payment_existing_account_and_channel_galleries(self):
         self.reach('payment_preparation')

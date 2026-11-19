@@ -8,6 +8,16 @@ ROOT = Path(__file__).resolve().parents[1]
 ALIPAY_URL = 'https://render.alipay.com/p/s/i/?scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D2021001165662428%26page%3Dpages%252Fredirect%252Fredirect%253FappId%253D2021003191605547%26enbsv%3D0.2.2507280946.43%26chInfo%3Dch_share__chsub_CopyLink%26fxzjshareChinfo%3Dch_share__chsub_CopyLink%26apshareid%3DA6364F5A-E354-477C-A944-0B4A1390FC24%26shareBizType%3DH5App_XCX%26shareTimestamp%3D1772934191191'
 GOOGLE_IMAGES = [f'assets/google-account/{name}-original.png' for name in
                  ('01-order', '02-2fa', '03-google-code')]
+CHUHAI_STEPS = {
+    'register': ('注册出海91网站账号', '01-register.png',
+                 '打开[出海91注册页](https://chuhai91.cc/auth/register)，用自己能收信的邮箱注册出海91购物网站账号，QQ 邮箱也可以。已有出海91账号就直接登录。'),
+    'category': ('进入谷歌精品老号分类', '02-google-aged-category.png',
+                 '登录出海91后进入「Google 谷歌账户 → 谷歌精品老号」，也可以打开[谷歌精品老号分类](https://chuhai91.cc/categories/premium-aged-google-accounts)。'),
+    'product': ('选择美国 IP 创建的老号', '03-us-ip-product.png',
+                '在商品详情确认标明美国 IP 创建／注册，再核对当前价格和库存、购买数量。购买后打开订单查看商家交付的 Google 账号资料。'),
+}
+CHUHAI_PURCHASE_IMAGES = {step: f'assets/chuhai91/{filename}' for step, (_, filename, _) in CHUHAI_STEPS.items()}
+CHUHAI_PAGE_TOPICS = {f'chuhai_{step}' for step in CHUHAI_STEPS}
 POLICY = ('当前操作有对应图解就默认在聊天直接展示，首次进入阶段就按顺序给齐该阶段适用的全部图解，配中文说明与当前起点；商家或渠道确定后立即给齐该分支整套图。整套已展示后按当前进度继续，求助时重讲对应页。'
           '用户说不会、找不到、没看懂、再讲一次或图片没显示时，结合当前页面和上下文重新取对应图并拆细说明，'
           '已讲过的标记不抑制本次求助。内容明确就直接讲；无法区分账号、验证码类型或操作设备时只问一个关键问题。'
@@ -29,13 +39,16 @@ CARDS = {
     'server_ssh': card('SSH 连接参考', 'vps server', '01-network.md', pics('images/network', '09.jpg'), '按当前电脑平台选择终端操作，示例图用于解释 SSH 连接，实际命令从本次服务器资料生成。'),
     'network_basics': card('VPS、节点与两台设备怎样连接', 'vps', '01-network.md', pics('images/network', '03.jpg'),
                           '先用架构图说明电脑和手机连接同一台 VPS，再确认已有服务器还是需要购买。'),
-    'chuhai_register': card('注册出海91网站账号', 'google', '08-google-account.md', pics('chuhai91', '01-register.png'),
-                           '用本人能收邮件的邮箱注册商家网站，QQ 邮箱也可以；看到登录后的购物页面再继续。', seller='chuhai91'),
-    'chuhai_category': card('进入谷歌精品老号分类', 'google', '08-google-account.md', pics('chuhai91', '02-google-aged-category.png'),
-                           '已登录商家网站后，按图打开 Google 谷歌账户，再进入谷歌精品老号。', seller='chuhai91'),
-    'chuhai_product': card('选择美国 IP 创建的老号', 'google', '08-google-account.md', pics('chuhai91', '03-us-ip-product.png'),
-                          '核对商品是否标明美国 IP 创建／注册，并看当前库存、数量与价格。', seller='chuhai91'),
-    'gmailbuy': card('GmailBuy 选购', 'google', '08-google-account.md', instruction='沿用 GmailBuy 当前页面，核对美区老号和价格；根据实际页面逐步说明。', seller='gmailbuy'),
+    'chuhai_purchase': card('出海91购买美区 Google 老号：完整图解', 'google', '08-google-account.md',
+                            CHUHAI_PURCHASE_IMAGES.values(),
+                            '\n'.join(f'{i}. {instruction}' for i, (_, _, instruction) in enumerate(CHUHAI_STEPS.values(), 1)),
+                            seller='chuhai91'),
+    **{f'chuhai_{step}': card(title, 'google', '08-google-account.md', [CHUHAI_PURCHASE_IMAGES[step]], instruction, seller='chuhai91')
+       for step, (title, _, instruction) in CHUHAI_STEPS.items()},
+    'gmailbuy': card('GmailBuy 选购与查单', 'google', '08-google-account.md', pics('step-guides', 'gmailbuy-shop.png'),
+                    '打开 [GmailBuy 商品列表](https://gmailbuy.com/)，找到首页「谷歌邮箱批发」商品列表（这是列表标题），按商品说明确认美国地区与注册时间。'
+                    '点对应行「购买」打开详情，核对当前价格、库存及售后。详情页的「查询密码」用于查订单，请自行设置并保存；数量按实际需求填写，付款由本人确认。'
+                    '完成后查看订单资料，再接账号字段和 2FA 图解。', seller='gmailbuy'),
     'google_materials': card('看懂账号资料和两步验证码', 'google login', '08-google-account.md', GOOGLE_IMAGES,
                             '按三张原图依次解释邮箱与密码、商家标注的 2FA 密钥、生成当前验证码及回填位置。取码链接：https://2fa.run/ 。现在可先看懂，实际登录按主流程进行。'),
     'google_2fa': card('2FA 密钥取码和回填', 'google login', '08-google-account.md', GOOGLE_IMAGES[1:],
@@ -60,11 +73,11 @@ CARDS = {
                           '在代理信息填已测通的本机 HTTP 入口，测试通过再保存；地址与端口采用本机实测值。'),
     'browser_fingerprint': card('AdsPower 指纹设置', 'browser', '02-browser-iphone.md', pics('images/browser-iphone', '03.png'),
                                 '按当前小步说明 WebRTC、定位和硬件真实值，保存后重新打开核对。'),
-    'phone_node': card('iPhone 小火箭导入和选中节点', 'phone_proxy', '02-browser-iphone.md', instruction='电脑打开本次生成的节点二维码，手机用小火箭扫描。导入后指出首页新增的那一行，选中后再开启连接；页面截图按实际入口定位。', phone='apple'),
+    'phone_node': card('iPhone 小火箭导入和选中节点', 'phone_proxy', '02-browser-iphone.md', pics('step-guides', 'phone-qr-import.png'), '电脑打开本次生成的节点二维码，手机用小火箭扫描。导入后指出首页新增的那一行，选中后再开启连接；页面截图按实际入口定位。', phone='apple'),
     'phone_config': card('小火箭配置分流参考', 'phone_proxy phone_network', '02-browser-iphone.md', pics('images/browser-iphone', '10.jpg'),
                          '这是既有配置案例和配置列表参考图；按客户实际文件名与规则处理，具体 DNS 添加、保存、回读见本章 2.2.4～2.2.5。', phone='apple'),
-    'phone_dns': card('小火箭 DNS 加入列表与保存', 'phone_proxy phone_network', '02-browser-iphone.md', instruction='按 2.2.5：输入网址，点绿色＋，看到独立条目后保存，退出重开核对，再重连复测。根据当前手机截图定位字段。', phone='apple'),
-    'phone_backup': card('手机本地保存配置与恢复', 'phone_proxy phone_network', '02-browser-iphone.md', instruction='按 2.2.4 保存原值和本机副本，确认能重新打开；恢复时固定目标，回读保存后的值，再测试网页、出口和微信。', phone='apple'),
+    'phone_dns': card('小火箭 DNS 加入列表与保存', 'phone_proxy phone_network', '02-browser-iphone.md', pics('step-guides', 'phone-dns-save.png'), '按 2.2.5：输入网址，点绿色＋，看到独立条目后保存，退出重开核对，再重连复测。根据当前手机截图定位字段。', phone='apple'),
+    'phone_backup': card('手机本地保存配置与恢复', 'phone_proxy phone_network', '02-browser-iphone.md', pics('step-guides', 'phone-config-backup.png'), '按 2.2.4 保存原值和本机副本，确认能重新打开；恢复时固定目标，回读保存后的值，再测试网页、出口和微信。', phone='apple'),
     'timezone': card('电脑、手机时区与定位', 'timezone', '02-browser-iphone.md', instruction='按当前电脑和手机平台分别给设置路径，每轮只操作一台设备，完成后回到原页面核对实际值。'),
     'network_check': card('在手机核对出口与检测结果', 'phone_network', '06-before-login.md', instruction='手机浏览器打开 https://ping0.cc/ 核对当前出口，再按章节检查三站、DNS 与 IPv6；先确认手机使用 Wi-Fi 还是蜂窝网络。'),
     'android_phone': card('安卓手机导入与检查', 'phone_proxy timezone phone_network', '11-android-web-pay.md', instruction='按安卓实际页面操作，复用服务器节点；时区、网络及付款使用安卓分支。', phone='android'),
@@ -94,7 +107,7 @@ CARDS = {
 }
 
 
-def eligible(topic, state):
+def eligible(topic, state, *, preview=False):
     from workflow_definition import facts
     item = CARDS[topic]
     device, account = facts(state, 'devices'), facts(state, 'google')
@@ -104,7 +117,7 @@ def eligible(topic, state):
         return False
     if item['phone'] == 'android' and device.get('phone') != 'android':
         return False
-    if item['seller'] and account.get('purchase_channel', 'chuhai91') != item['seller']:
+    if not preview and item['seller'] and account.get('purchase_channel', 'chuhai91') != item['seller']:
         return False
     return True
 
@@ -121,7 +134,7 @@ def alipay_instructions():
 def guide(topic, state, stage, step=None):
     if not isinstance(topic, str) or topic not in CARDS:
         raise ValueError('unknown_teaching_topic')
-    if not eligible(topic, state):
+    if not eligible(topic, state, preview=True):
         raise ValueError('teaching_topic_not_for_current_device_or_seller')
     item = deepcopy(CARDS[topic])
     if topic == 'gift_alipay':
@@ -147,9 +160,11 @@ def guide(topic, state, stage, step=None):
     pdf_name = pdf_files.get(Path(item['reference']).name)
     pdf = ROOT / 'assets/reading' / pdf_name if pdf_name else None
     fallback = f'[打开对应图文 PDF](<{pdf.as_posix()}>)' if pdf and pdf.is_file() else ''
+    image_links = [f'[单独打开图 {item["images"].index(p) + 1}](<{(ROOT / p).as_posix()}>)' for p in available]
     message = item['instruction'] + ('\n\n' + '\n\n'.join(markup) if markup else '')
+    if image_links:
+        message += '\n\n如果聊天里的图没显示：' + ' · '.join(image_links + ([fallback] if fallback else []))
     if topic == 'vps_bandwagon':
-        message += '\n\n' + fallback
         registration = ROOT / 'assets/vps-purchase/bandwagon-registration.pdf'
         if registration.is_file():
             message += f'\n\n[搬瓦工注册中文图解 PDF](<{registration.as_posix()}>)'
@@ -158,11 +173,11 @@ def guide(topic, state, stage, step=None):
     return {'status': 'teaching', 'stage': stage, 'topic': topic, 'title': item['title'],
             'reference': item['reference'], 'instruction': item['instruction'], 'customer_message': message, 'fallback_document': fallback,
             'customer_images': available,
-            'image_markdown': markup,
+            'image_markdown': markup, 'image_links': image_links,
             'missing_images': missing, 'step': step, 'total_steps': len(item['images']),
             'progress_unchanged': True,
             'display_instruction': POLICY + ' 当前主题只用于定位讲解；阶段或分支首次展示时，仍按 next 返回的 customer_images 补齐所有尚未展示的适用图。首次展示将 image_markdown 全部嵌入聊天；--step 仅用于后续定位重讲，不限制首次整组展示。'
-            '缺图或显示失败时给出可打开的原文件／对应 PDF，继续用当前页面拆细指导；原图示例不覆盖现场值。',
+            '客户说图没看到、空白或打不开时，重发整组适用图并在同条回复保留 image_links 或 fallback_document；缺图时继续用当前页面拆细指导。原图示例不覆盖现场值。',
             'resume_instruction': '讲解结束后回到原阶段，只提交实际完成的观察；已有等待与付款安排继续沿用。'}
 
 
@@ -175,6 +190,9 @@ def attach(result, state):
     result['teaching_topics'] = [dict(id=k, title=v['title'], reference=v['reference'],
                                      images=v['images'], when=v['instruction'])
                                 for k,v in CARDS.items() if stage in v['stages'] and eligible(k,state)]
+    selected = data.get('teaching_topic')
+    gallery = stage_gallery(state, stage, result, selected)
+    gallery_topics = [lesson['topic'] for lesson in gallery]
     default = None
     if result.get('status') == 'needs_support' or data.get('purchase_restricted') is True:
         default = 'apple_support' if eligible('apple_support', state) else None
@@ -186,7 +204,9 @@ def attach(result, state):
         elif stage == 'google' and data.get('account_origin') == 'purchased' and data.get('account_available') is True:
             default = 'google_materials'
         elif stage == 'google' and data.get('account_available') is False:
-            default = {'chuhai91':'chuhai_register', 'gmailbuy':'gmailbuy'}.get(data.get('purchase_channel'))
+            default = 'gmailbuy' if data.get('purchase_channel') == 'gmailbuy' else 'chuhai_purchase'
+        elif stage == 'vps':
+            default = next((topic for topic in gallery_topics if topic in ('vps_bandwagon', 'vps_dmit')), 'network_basics')
         elif stage == 'browser':
             default = ('browser_profile' if not data.get('profile_ref') else
                        'browser_proxy' if not data.get('proxy_configured') else
@@ -198,15 +218,15 @@ def attach(result, state):
         elif stage == 'subscription':
             default = 'claude_subscribe' if data.get('order_confirmed') is not True and eligible('claude_subscribe',state) else None
         else:
-            default = {'cleanup':'cleanup', 'vps':'network_basics', 'server':'server_panel',
+            default = {'cleanup':'cleanup', 'server':'server_panel',
                        'computer_network':'windows_client' if facts(state,'devices').get('computer')=='windows' else 'mac_client',
                        'phone_proxy':'phone_node' if eligible('phone_node',state) else 'android_phone',
                        'timezone':'timezone' if facts(state,'devices').get('phone')!='android' else 'android_phone',
                        'phone_network':'network_check', 'app':'claude_app' if eligible('claude_app',state) else 'android_phone',
                        'login':'google_login'}.get(stage)
-    selected = data.get('teaching_topic')
-    gallery = stage_gallery(state, stage, result, selected)
     if (isinstance(selected, str) and selected in CARDS and stage in CARDS[selected]['stages'] and eligible(selected,state)
+            and selected not in CHUHAI_PAGE_TOPICS
+            and (not CARDS[selected]['images'] or selected in gallery_topics)
             and result.get('status') not in ('waiting', 'needs_support')
             and data.get('purchase_restricted') is not True
             and not (stage == 'payment_preparation' and data.get('gift_channel') == 'alipay' and selected == 'gift_official')
@@ -215,7 +235,7 @@ def attach(result, state):
                      and data.get('payment_ready') is not True)
             and not (stage == 'subscription' and data.get('order_confirmed') is True)):
         default = selected
-    if default and CARDS[default]['images'] and not any(lesson['topic'] == default for lesson in gallery):
+    if default and CARDS[default]['images'] and default not in gallery_topics:
         default = None
     if default and eligible(default,state):
         step = data.get('teaching_step') if default == selected else None
@@ -223,7 +243,7 @@ def attach(result, state):
         if not result.get('customer_message') and not CARDS[default]['images']:
             result['customer_message'] = result['default_teaching']['customer_message']
     if gallery:
-        result['gallery_topics'] = [lesson['topic'] for lesson in gallery]
+        result['gallery_topics'] = gallery_topics
         result['customer_message'] = result.get('customer_message', '') + '\n\n下面先给齐本阶段图解，按上面的当前任务开始，已完成的部分直接往下接。'
         if result.get('status') == 'waiting':
             result['customer_message'] += '当前仍按已确认的时间等待；以下购买与兑换图解先供您查看，到时间后再操作。'
@@ -269,6 +289,10 @@ def stage_gallery(state, stage, result, selected):
         support = result.get('status') == 'needs_support' or data.get('purchase_restricted') is True
         if support != (topic == 'apple_support'):
             continue
+        if topic == 'phone_node' and data.get('client_available') is False:
+            continue
+        if topic in ('phone_dns', 'phone_backup') and selected != topic:
+            continue
         if topic in ('google_materials', 'google_2fa'):
             account = facts(state, 'google')
             purchasing = account.get('account_available') is False and account.get('purchase_channel') in ('chuhai91', 'gmailbuy')
@@ -290,7 +314,7 @@ def stage_gallery(state, stage, result, selected):
             continue
         if stage == 'vps' and data.get('vps_origin') == 'existing' and topic.startswith('vps_'):
             continue
-        if stage == 'google' and item['seller'] and data.get('account_available') is not False:
+        if stage == 'google' and item['seller'] and (data.get('account_available') is not False or topic in CHUHAI_PAGE_TOPICS):
             continue
         if topic == 'gift_official' and data.get('gift_channel') != 'apple_official':
             continue

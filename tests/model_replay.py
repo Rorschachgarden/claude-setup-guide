@@ -61,10 +61,12 @@ JOURNEYS = {
         'VPS 还没买。我再问一下，后面 iPhone 订阅是不是用 Apple ID？我电脑还装了 ChatGPT 和 Photoshop，这些要卸载吗？',
         '我看到有人说明年这个套餐要涨到 129 美元，还说购买之前必须先买域名。这些是真的吗？我还在注册页面。']),
     'google': ('google', [
-        '没有能正常登录 Claude 的 Google 账号。',
-        '我选出海91，网站已经注册好了，下一步买什么？',
+        '没有能正常登录的谷歌账号。',
+        '就按你推荐的出海91买。把购买程序发我一下，刚才没看到图。是先注册谷歌吗？',
+        '出海91网站已经注册并登录好了，下一步买哪个？',
         '买好了，账号资料也收到了，看不懂。',
-        '刚才那个验证码还是不会弄，图没显示，你再教我一下。']),
+        '刚才那个验证码还是不会弄，图没显示，你再教我一下。',
+        '图都看到了，我现在知道账号和验证码怎么用了。还没实际登录，下一步呢？']),
     'gift': ('payment_preparation', [
         '我要买礼品卡，怎么购买？',
         '从备忘录点开了，现在已经在支付宝里面看到礼品卡页面了。',
@@ -234,19 +236,31 @@ def assess(root, name, turn, response, commands, before, code, transcript=()):
             'response_present':bool(response.strip()),'source_unchanged':source_hashes(root)==before}
     images=re.findall(r'!\[[^\]]*\]\(<?([^)>]+)>?\)',response)
     def picture(fragment): return any(fragment in x and Path(x).is_file() for x in images)
-    if name in ('bought','repeat_code') or name=='google' and turn>=2:
+    if name in ('bought','repeat_code') or name=='google' and turn in (3,4):
         checks.update(code_link='https://2fa.run/' in response,
                       original_images=picture('/google-account/02-2fa-original.png') and picture('/google-account/03-google-code-original.png'),
                       no_early_login=stage in ('google','vps'))
-        if name=='bought' or name=='google' and turn==2:
+        if name=='bought' or name=='google' and turn==3:
             checks['account_materials_picture']=picture('/google-account/01-order-original.png')
     elif name=='google':
-        checks['stage_preserved']=stage=='google'
-        if turn==0:
-            checks['two_sellers']='https://chuhai91.cc' in response and 'https://gmailbuy.com' in response
-            checks['us_aged_account']='美区' in response and '老号' in response
+        if turn==5:
+            checks['vps_handoff']=stage=='vps' and 'VPS' in response
         else:
+            checks['stage_preserved']=stage=='google'
+        if turn==0:
+            checks['two_sellers']='https://chuhai91.cc/' in response and 'https://gmailbuy.com/' in response
+            checks['us_aged_account']=all(word in response for word in ('购买','美区','老号'))
+        if turn in (0,1):
+            checks['complete_purchase_gallery']=all(picture('/chuhai91/'+p) for p in
+                ('01-register.png','02-google-aged-category.png','03-us-ip-product.png'))
+            checks['direct_register_link']='https://chuhai91.cc/auth/register' in response
+            checks['seller_registration']=re.search(r'注册[^。！\n]{0,20}出海91|出海91[^。！\n]{0,24}注册',response) is not None
+        if turn==1:
+            checks['new_purchase_preview']=all(picture('/google-account/'+p+'-original.png') for p in
+                ('01-order','02-2fa','03-google-code'))
+        if turn==2:
             checks['correct_purchase_step']=picture('/chuhai91/02-google-aged-category.png') or picture('/chuhai91/03-us-ip-product.png')
+            checks['direct_category_link']='https://chuhai91.cc/categories/premium-aged-google-accounts' in response
     elif name=='cross_stage_google':
         checks['expected_stage']=stage==('google' if turn<2 else 'vps')
         checks['no_blanket_phone_exemption']=not any(x in response for x in ('不需要外国手机号', 'Claude 注册不要求单独填写手机号', '不需要为注册 Claude 单独换号', '手机号不是注册 Claude 的必填项', '手机号不是注册 Claude 的固定必填项', '注册／登录 Claude 不需要外国手机号'))
@@ -345,7 +359,7 @@ def assess(root, name, turn, response, commands, before, code, transcript=()):
             'gift':[f'/images/apple/{i:02}.jpg' for i in (14,15)],
             'server':[f'/images/network/{i}.jpg' for i in range(10,15)],
             'network':[f'/images/network/{i:02}.jpg' for i in (1,2,15,16,17)],
-            'phone_gallery':['/images/network/14.jpg','/images/browser-iphone/10.jpg'],
+            'phone_gallery':['/images/network/14.jpg','/step-guides/phone-qr-import.png','/images/browser-iphone/10.jpg'],
             'login_gallery':[],
             'mac_gallery':[f'/images/network/{i:02}.jpg' for i in (1,2,19,20)],
         }[name]
@@ -357,10 +371,6 @@ def assess(root, name, turn, response, commands, before, code, transcript=()):
             checks['no_unrelated_account_images']=not any(picture(f'/images/apple/{i:02}.jpg') for i in range(1,10))
     if name=='network' and turn==1:
         checks['complete_browser_gallery']=all(picture(f'/images/browser-iphone/0{i}.png') for i in (1,2,3))
-    if name=='google' and turn==1:
-        shown=response+'\n'+'\n'.join(item['assistant'] for item in transcript)
-        checks['complete_seller_gallery']=all('/chuhai91/'+p in shown for p in ('01-register.png','02-google-aged-category.png','03-us-ip-product.png'))
-        checks['new_purchase_preview']=all(picture('/google-account/'+p+'-original.png') for p in ('01-order','02-2fa','03-google-code'))
     if name in ('phone_gallery','login_gallery','mac_gallery'):
         expected = {'phone_gallery':'phone_proxy','login_gallery':'login','mac_gallery':'computer_network'}[name] if turn<2 else {'phone_gallery':'timezone','login_gallery':'subscription'}[name]
         checks['stage_preserved']=stage==expected

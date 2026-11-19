@@ -5,23 +5,18 @@ PDF_GUIDANCE = """**项目已经下载好了**，接下来 Codex 会按项目流
 
 **建议把 PDF 单独保存一份。需要我帮您放到“下载”文件夹吗？**文件已在项目里，无需重新下载。"""
 GOOGLE_QUESTION = '您有没有能正常登录 Claude、没有被 Claude 封禁的 Google 账号？有的话直接沿用。'
-GOOGLE_PURCHASE = """需要买号时，**优先购买美区 Google 老号**，这两个网站都可以选：
+GOOGLE_PURCHASE = """您目前没有可用的 Google 账号。**优先购买美区 Google 老号**，首选出海91。两个网站都可以选：
 
 - 首选 [出海91](https://chuhai91.cc/)：按我们的选购经验，价格相对贵一点，账号也相对稳一点。
 - [GmailBuy](https://gmailbuy.com/)：价格相对便宜一点，按我们的选购经验，被封的可能性也大一点。
 
-看您个人选择。选出海91的话，先用您自己的邮箱注册网站账号，QQ 邮箱也可以；已有网站账号就直接登录。然后进入「Google 谷歌账户 → 谷歌精品老号」，优先选标明“美国 IP 创建／注册”的老号，按当前价格和库存选择。我会按图一步步带您操作，购买后继续看账号资料和登录时的两步验证。"""
+看您个人选择。下面是出海91完整三步图。如果您选这家，就从注册出海91购物网站账号开始，QQ 邮箱也可以。买到的 Google 账号用于后续登录 Claude。"""
 GOOGLE_MATERIALS_GUIDANCE = '收到账号资料后，先找到 Google 邮箱、登录密码，以及商家标注的“2FA 密钥”。2FA 密钥是一串用来生成登录验证码的字母和数字。取码网址是 [2FA 取码工具：https://2fa.run/](https://2fa.run/)。等手机网络配置完成、Google 登录页面要求身份验证器验证码时，再按图用密钥生成验证码，并填回手机登录页面。'
 GOOGLE_LOGIN_GUIDANCE = '手机网络已经验收完成，接下来在手机上使用准备好的 Google 账号登录 Claude。按当前页面输入账号和密码；Google 要求身份验证器验证码时，再按下面的取码步骤操作。'
 GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。使用商家提供的 2FA 密钥时，在已配置好的 AdsPower 中打开网站，将密钥填入上方“JS实现”区域，点击“点击获取验证码”，再把当前验证码填回手机 Google 页面。使用自己的 Google 账号时，也可以从自己已绑定的身份验证器取得验证码；其他验证方式按当前页面完成。'
-from workflow_teaching import GOOGLE_IMAGES, attach as attach_teaching
+from workflow_teaching import CHUHAI_PURCHASE_IMAGES, GOOGLE_IMAGES, attach as attach_teaching
 GOOGLE_ORDER_IMAGES = GOOGLE_IMAGES.copy()
 GOOGLE_VERIFICATION_IMAGES = ['assets/google-account/02-2fa-original.png', 'assets/google-account/03-google-code-original.png']
-GOOGLE_PURCHASE_IMAGES = {
-    'register': 'assets/chuhai91/01-register.png',
-    'category': 'assets/chuhai91/02-google-aged-category.png',
-    'product': 'assets/chuhai91/03-us-ip-product.png',
-}
 CUSTOMER_STYLE = '客户对话先给明确建议，再给当前操作和预期结果，用简短大白话。沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
 TASK_SCOPE = ('保留用户的实际目的、授权范围和真实上下文。'
               '先区分客户是在提问、补充信息，还是明确要求暂停、结束或改变任务。'
@@ -30,7 +25,7 @@ TASK_SCOPE = ('保留用户的实际目的、授权范围和真实上下文。'
               '客户明确要求改变任务时，按其明确要求处理。')
 QUESTION_INSTRUCTION = {
     '核对': '先读取问题对应的教程小节；涉及外部服务现行要求时查官方资料或实际页面。核对结论针对的产品、操作与适用范围，分别判断。教程未提及某项要求，只说明这里没有答案；先前模型回复和通用经验也不作为查证结果。',
-    '有直接依据': '简短回答，并在结论旁给出实际读取的章节或官方链接。仅陈述该依据明确支持的范围。',
+    '有直接依据': '简短回答，并在每个结论旁给出实际读取的章节、官方链接或页面观察。教程与外部资料分别注明来源，只引用该来源实际写出的内容。不同产品或不同账号的验证各自核对；一般说明不能证明客户当前页面已经要求该项验证。',
     '暂时没有依据': '采用这句简短答复：“这项具体要求还需要核实，到了对应步骤我会按实际要求带您处理。”随后接回当前动作。此分支只表达待核实，不补写需要、不需要、可以、不可以等确定判断，也不添加猜测性解释。',
     '记录当前结果': '提交 source.reference 时保留客户有关完成项的原话及其中的不确定性。客户表示不记得、不确定或未核实时，相关完成项先保持未确认，追问缺的事实；不能把这类原话概括成客户明确确认完成。已明确的其他信息可以单独记录。',
     '继续当前流程': '答疑与进度分别处理。当前阶段的真实完成结果照常记录；后续问题仍待核实也不阻塞已具备条件的当前步骤。',
@@ -117,24 +112,27 @@ def customer_output(result, state, now):
             result['customer_images'] = GOOGLE_ORDER_IMAGES.copy()
             result['next_action'] = ('在当前回复直接展示 customer_message 中的 2FA 取码链接，并将 customer_images 转为当前项目的绝对路径嵌入聊天。'
                                      '解释邮箱、密码及商家标注的密钥用途，实际嵌入三张原图后提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按返回任务继续；这一步由 Codex 展示完成，无需客户额外确认。')
-        else:
-            if available is not False:
-                messages.append(GOOGLE_QUESTION)
-            elif channel == 'gmailbuy':
+        elif available is False:
+            if channel == 'gmailbuy':
                 messages.append('沿用您选择的 [GmailBuy](https://gmailbuy.com/)，优先购买美区 Google 老号。我会按您当前的商品页核对美区、老号、价格和库存。')
-            elif channel == 'chuhai91':
-                messages.append('沿用您选择的 [出海91](https://chuhai91.cc/)，按图继续：用自己的邮箱注册网站账号（QQ 邮箱也可以）→ Google 谷歌账户 → 谷歌精品老号 → 选择美国 IP 创建／注册的老号。已完成的步骤接着往下做。')
+                result['next_action'] = '在当前回复展示 GmailBuy 商品列表入口与选购步骤图；根据实际页面讲当前操作，客户说找不到或没看到图时用 guide --topic gmailbuy 重发。'
             else:
-                messages.append(GOOGLE_PURCHASE)
+                messages.append(GOOGLE_PURCHASE if channel is None else
+                                '沿用您选择的出海91，继续购买美区 Google 老号。先注册或登录出海91网站账号，再从下面的三步图接到已完成的位置。')
+                result['purchase_images'] = CHUHAI_PURCHASE_IMAGES.copy()
+                result['next_action'] = ('本轮先明确推荐购买美区 Google 老号；首次推荐同时给两家链接，首选出海91。'
+                                         '将 customer_message 里的出海91注册、分类和选购三张原图直接嵌入同一条回复，指出现在从哪一步开始。'
+                                         '客户索要购买步骤、找不到图或没看懂时，运行 guide --topic chuhai_purchase，把三张原图和入口链接重新给齐。'
+                                         '注册的是出海91购物网站账号，本流程不引导注册 Google 账号。客户明确选择网站后记录 purchase_channel，已完成的步骤直接沿用。客户问买哪个时，按实际页面定位老号分类并核对美区、价格与库存。')
+            result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 account_available=true，直接展示资料、取码和回填三张图及取码链接。'
+                                      '若客户后来找回自己的可用账号，明确提交 account_origin=self_used 继续复用。')
             messages.append(GOOGLE_TIMING)
-            if available is False and channel != 'gmailbuy':
-                result['purchase_images'] = dict(GOOGLE_PURCHASE_IMAGES)
-            result['next_action'] = ('先单独确认有没有能正常登录 Claude、没有被 Claude 封禁的 Google 账号；确认可复用后提交 account_origin=self_used 与 account_available=true。账号复用以 Claude 的可用状态为准。Google／Gmail 能登录，但对应的 Claude 账号已被封禁时，记录 account_available=false，继续准备其他可用账号；若后来找回的账号也已被 Claude 封禁，同样按此处理。尚未用过 Claude 的 Google 账号先确认既有情况，实际登录仍留到手机网络验收后，不为回答这个问题提前登录。'
-                                     '没有则先明确推荐“优先购买美区 Google 老号”，同时展示出海91与GmailBuy两个可点击链接和选购差别；已有 purchase_channel 时沿用选择。'
-                                     '客户选择后记录 purchase_channel=chuhai91 或 gmailbuy。客户问买哪个时按实际页面定位老号分类并核对美区，按当前价格与库存推荐。'
-                                     '选择出海91时，按 references/08-google-account.md 的三步图示逐步带做并展示对应本地图片；从 purchase_images 取当前步骤，将路径转为项目绝对路径嵌入聊天。选择 GmailBuy 时按该网站页面带做。'
-                                     '注册的是购物网站账号，本流程不引导注册 Google 账号。客户说买好并收到资料时，提交 account_origin=purchased 与 account_available=true，程序将返回资料说明、取码链接和原账号资料图。'
-                                     '若先前没有账号、后来找回自己的可用账号，则明确提交 account_origin=self_used 继续复用。实际登录留到手机网络验收后。')
+        else:
+            messages.extend([GOOGLE_QUESTION, GOOGLE_TIMING])
+            result['next_action'] = ('先单独确认有没有能正常登录 Claude、没有被 Claude 封禁的 Google 账号。'
+                                     '客户明确没有，或 Google／Gmail 能登录，但对应的 Claude 账号已被封禁时，立即记录 account_available=false，再按返回内容在本轮给出购买建议和完整图解。'
+                                     '确认可复用时提交 account_origin=self_used 与 account_available=true。'
+                                     '尚未用过 Claude 的 Google 账号先确认既有情况，实际登录留到手机网络验收后，不为回答这个问题提前登录。')
     if key == 'login':
         messages.extend([GOOGLE_LOGIN_GUIDANCE, GOOGLE_VERIFICATION_GUIDANCE])
         result['verification_images'] = GOOGLE_VERIFICATION_IMAGES.copy()
@@ -157,7 +155,8 @@ def customer_output(result, state, now):
                                   '先 run --action vps_capture --input 页面输入.json 采集页面，观察填写 receipt_id 并逐字引用 evidence；'
                                   '可购买还需 billing_evidence 引用周期、本次金额和续费金额。用返回的 purchase_decision 决定查看哪家。can_purchase=true 才给付款指引。')
         if maintained:
-            result['next_action'] = '记录 vps_origin=existing 或 purchase；购买后确认服务器开通和SSH访问，再提交 access_ready=true。'
+            result['next_action'] = ('记录 vps_origin=existing 或 purchase。确认客户要买搬瓦工后，在本轮给齐 customer_message 中四张注册图和一张套餐图；客户找不到入口或图没显示时用 guide --topic vps_bandwagon 重发。'
+                                     '购买后确认服务器开通和 SSH 访问，再提交 access_ready=true。')
         if current_check:
             result['next_action'] = '按 purchase_decision 处理当前推荐套餐的复核结果；可购买时继续核对金额和开通资料，缺货、金额变化或尚未核实时反馈维护者。'
         if facts(state, 'vps').get('vps_origin') == 'purchase':
@@ -236,7 +235,7 @@ def customer_output(result, state, now):
             'dns_reference': 'references/02-browser-iphone.md#225-dns-添加输入加入列表保存回读',
             'action': '按当前设备页面带做，每轮 1～3 个相连动作并说明可见结果。修改前记录原值和恢复目标；节点导入资料与 DNS／分流配置分别保存，复制到剪贴板后还要保存并重新打开核对。DNS 列表界面输入后点绿色＋，看到独立条目及红色－后保存，退出重开回读，再重连复测。当前正常时沿用原值；菜单与教程不同先读取页面。恢复目标冲突时先核对已执行动作，再继续。',
         }
-        result['next_action'] += ' 需要保存配置、恢复原值或修改 DNS 时，先读取 manual_guidance 的对应章节；按当前动作逐轮展示，回读保存结果后再做联网复测。'
+        result['next_action'] += ' 找不到扫码入口时用 guide --topic phone_node。需要保存或恢复配置、修改 DNS 时，分别用 guide --topic phone_backup、phone_dns 出图，并读取 manual_guidance 的对应章节；回读保存结果后再复测。'
         if device.get('computer') == 'windows':
             result['communication_instruction'] += (' Windows＋iPhone／iPad 每轮先标明操作设备；电脑展示节点二维码与整理资料，手机执行小火箭、Safari、微信操作。'
                                                       '每轮给 1～3 个相连动作与预期结果。默认在手机本地保存配置；Wi-Fi 上传持续超时就回到手机保存。')

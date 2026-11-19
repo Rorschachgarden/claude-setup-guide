@@ -121,9 +121,16 @@ class TeachingTests(unittest.TestCase):
         c=self.case;c.reach('google')
         c.flow.submit(c.payload({'account_available':False,'purchase_channel':'gmailbuy'}))
         self.assertNotIn('chuhai_register',[t['id'] for t in c.flow.next()['teaching_topics']])
-        with self.assertRaisesRegex(ValueError,'not_for_current'):c.flow.guide('chuhai_register')
+        before=c.flow.path.read_bytes()
+        preview=c.flow.guide('chuhai_purchase')
+        self.assertEqual(len(preview['customer_images']),3)
+        for image in preview['customer_images']:
+            self.assertIn(f'](<{ROOT/image}>)',preview['customer_message'])
+        self.assertEqual(len(preview['image_links']),3)
+        self.assertEqual(c.flow.path.read_bytes(),before)
         with self.assertRaisesRegex(ValueError,'not_for_current'):c.flow.guide('mac_client')
-        self.assertEqual(c.flow.guide('gmailbuy')['customer_images'],[])
+        self.assertEqual(c.flow.guide('gmailbuy')['customer_images'],['assets/step-guides/gmailbuy-shop.png'])
+        self.assertIn('https://gmailbuy.com/',c.flow.guide('gmailbuy')['customer_message'])
 
     def test_android_has_no_apple_defaults_or_gift_topics(self):
         c=self.case;c.phone='android'
@@ -178,7 +185,9 @@ class TeachingTests(unittest.TestCase):
 
     def test_bandwagon_registration_gallery_survives_resume_and_focus(self):
         c=self.case;c.reach('vps')
-        view=c.flow.submit(c.payload({'vps_origin':'purchase','teaching_topic':'vps_bandwagon','teaching_step':1}))
+        view=c.flow.submit(c.payload({'vps_origin':'purchase'}))
+        self.assertEqual(view['default_teaching']['topic'],'vps_bandwagon')
+        view=c.flow.submit(c.payload({'teaching_topic':'vps_bandwagon','teaching_step':1}))
         expected=[f'assets/vps-purchase/bandwagon-register-{i}.png' for i in range(1,5)] + ['assets/vps-purchase/bandwagon-plan.png']
         for path in expected:
             self.assertIn(path,view['customer_images'])
@@ -219,6 +228,13 @@ class TeachingTests(unittest.TestCase):
                            'assets/chuhai91/02-google-aged-category.png','assets/chuhai91/03-us-ip-product.png')))
         self.assertNotIn('purchase_channel',view['observed'])
         self.assertIn('https://gmailbuy.com',view['customer_message'])
+        self.assertIn('https://chuhai91.cc/auth/register',view['customer_message'])
+        self.assertIn('https://chuhai91.cc/categories/premium-aged-google-accounts',view['customer_message'])
+        self.assertNotIn('先单独确认',view['next_action'])
+        self.assertEqual(view['default_teaching']['topic'],'chuhai_purchase')
+        repeated=c.flow.guide('chuhai_purchase')
+        self.assertEqual(repeated['customer_images'],view['customer_images'])
+        self.assertTrue(repeated['progress_unchanged'])
 
     def test_chosen_seller_starts_with_all_purchase_and_material_images(self):
         c=self.case;c.reach('google')
@@ -269,7 +285,8 @@ class TeachingTests(unittest.TestCase):
         self.assertEqual(result['customer_images'],[])
         self.assertEqual(result['missing_images'],GOOGLE_IMAGES[1:])
         self.assertNotIn('![',result['customer_message'])
-        self.assertIn('缺图或显示失败',result['display_instruction'])
+        self.assertEqual(result['image_links'],[])
+        self.assertIn('缺图',result['display_instruction'])
 
     def test_sms_help_does_not_supply_authenticator_diagrams(self):
         c=self.case;c.reach('login')

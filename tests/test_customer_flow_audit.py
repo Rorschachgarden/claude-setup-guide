@@ -369,7 +369,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('直接沿用', view['customer_message'])
         for url in ('https://chuhai91.cc', 'https://gmailbuy.com/'):
             self.assertNotIn(url, view['customer_message'])
-        self.flow.submit(self.payload({'account_available': False}))
+        view = self.flow.submit(self.payload({'account_available': False}))
         for url in ('https://chuhai91.cc/', 'https://gmailbuy.com/'):
             self.assertIn(url, self.flow.next()['customer_message'])
         self.assertIn('手机网络配置完成后', view['customer_message'])
@@ -394,7 +394,9 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('[GmailBuy](https://gmailbuy.com/)', view['customer_message'])
         self.assertIn('[2FA 取码工具：https://2fa.run/](https://2fa.run/)', view['account_materials_message'])
         self.assertIn('客户说买好并收到资料时', view['next_action'])
-        self.assertIn('展示对应本地图片', view['next_action'])
+        self.assertEqual(len(view['customer_images']), 3)
+        for image in view['customer_images']:
+            self.assertIn(image, view['customer_message'])
         self.assertIn('先明确推荐', view['next_action'])
         self.assertIn('按实际页面定位老号分类并核对美区', view['next_action'])
         self.assertIn('避免叠加假设性风险', view['communication_instruction'])
